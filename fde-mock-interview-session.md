@@ -336,12 +336,71 @@ def execute_tool(tool_name, tool_input, user_id):
 
 ---
 
+## Area 4: Observability and Debugging
+
+### 6 Things to Log on Every API Call (memorize these)
+
+```python
+import time, logging
+
+def call_claude(messages, tools, portfolio_id):
+    start = time.time()
+    
+    response = client.messages.create(
+        model="claude-sonnet-4-6",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    
+    logging.info({
+        "portfolio_id": portfolio_id,                    # 1. which client
+        "input_tokens": response.usage.input_tokens,     # 2. context size
+        "output_tokens": response.usage.output_tokens,   # 3. response size
+        "stop_reason": response.stop_reason,             # 4. how it ended
+        "latency_ms": round((time.time() - start) * 1000), # 5. how long
+        "tool_called": response.content[0].name          # 6. which tool
+                       if response.stop_reason == "tool_use" else None
+    })
+    
+    return response
+```
+
+### 4-Step Debugging Process
+
+```
+Step 1: Search logs by portfolio_id + timestamp
+Step 2: Check stop_reason — end_turn (normal) or max_iterations (looped)?
+Step 3: Check tool results — was the market data correct?
+Step 4: Replay with same inputs — does it reproduce?
+```
+
+### 5 Failure Modes to Know
+
+| Problem | Symptom | Detection |
+|---|---|---|
+| Agent loops | Never returns | Log iteration count |
+| Tool failure | Wrong output | Log tool result every call |
+| Context overflow | Confused output | Alert when input_tokens > 80% of limit |
+| Prompt regression | Quality drops | Compare stop_reason distribution |
+| Cost spike | High bill | Alert when tokens per run anomalous |
+
+### Area 4 Score: Borderline
+
+| Strong | Gap |
+|---|---|
+| Got 5 of 6 log fields | Missed stop_reason |
+| Right instinct on portfolio_id | Needed teaching before answering |
+| Got tokens and latency | Couldn't write code independently |
+
+---
+
 ## Areas Remaining
 
 - [x] Area 1: System Design for Agentic Systems
 - [x] Area 2: Token Optimization and Cost Engineering
 - [x] Area 3: Security (prompt injection, sandboxing, secrets)
-- [ ] Area 4: Observability and Debugging
+- [x] Area 4: Observability and Debugging
 - [ ] Area 5: Platform-specific (Claude API)
 - [ ] Area 6: Full mock debrief
 
