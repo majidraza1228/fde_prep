@@ -13,6 +13,8 @@ Each area is taught first, then tested. Gaps are scored honestly.
 | File | Description |
 |---|---|
 | [fde-mock-interview-session.md](fde-mock-interview-session.md) | Full study guide — code examples, scores, and key rules from each area |
+| [microsoft-azure-github.md](microsoft-azure-github.md) | Azure OpenAI, Managed Identity, Content Safety, GitHub Copilot, GitHub Actions |
+| [prompt-caching.md](prompt-caching.md) | Prompt caching deep dive — rules, best practices, cost examples, test questions |
 | [reference-material.md](reference-material.md) | Official docs and links for deeper reading |
 
 ---
@@ -24,9 +26,10 @@ Each area is taught first, then tested. Gaps are scored honestly.
 - [x] Area 3: Security — Prompt Injection, Sandboxing, Secrets
 - [x] Area 4: Observability and Debugging
 - [x] Area 5: Platform-Specific — Claude API
-- [ ] Area 6: OpenAI API
-- [ ] Area 7: Microsoft / Azure
-- [ ] Area 8: Kubernetes + AWS for AI Workloads
+- [x] Area 6: Microsoft / Azure / GitHub Copilot
+- [x] Area 7: Prompt Caching — Deep Dive
+- [ ] Area 8: OpenAI API
+- [ ] Area 9: Kubernetes + AWS for AI Workloads
 
 ---
 
