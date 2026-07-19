@@ -395,13 +395,105 @@ Step 4: Replay with same inputs — does it reproduce?
 
 ---
 
+## Area 5: Platform-Specific — Claude API
+
+### Complete run_agent Function (memorize this)
+
+```python
+import anthropic, os
+
+client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+
+system = [{
+    "type": "text",
+    "text": "You are a wealth management analyst...",
+    "cache_control": {"type": "ephemeral"}  # cache static system prompt
+}]
+
+def run_agent(user_input):
+    messages = [{"role": "user", "content": user_input}]
+    
+    for i in range(10):  # iteration guard
+        response = client.messages.create(
+            model="claude-sonnet-4-6",
+            system=system,
+            tools=tools,
+            max_tokens=1024,
+            messages=messages
+        )
+        
+        if response.stop_reason == "end_turn":
+            return response.content[0].text
+        
+        elif response.stop_reason == "tool_use":
+            tool = response.content[0]
+            result = execute_tool(tool.name, tool.input)
+            
+            messages.append({"role": "assistant", "content": response.content})
+            messages.append({
+                "role": "user",
+                "content": [{
+                    "type": "tool_result",
+                    "tool_use_id": tool.id,   # must match — causes 400 if wrong
+                    "content": str(result)
+                }]
+            })
+        
+        elif response.stop_reason == "max_tokens":
+            raise Exception("Response truncated — increase max_tokens")
+    
+    raise Exception("Max iterations hit")
+```
+
+### The 3 stop_reasons
+
+| stop_reason | Meaning | What to do |
+|---|---|---|
+| `end_turn` | Finished normally | Return response.content[0].text |
+| `tool_use` | Wants to call a tool | Execute tool, append result, loop |
+| `max_tokens` | Output cut off | Raise exception or increase max_tokens |
+
+### Tool Result Format (most common 400 error cause)
+
+```python
+# This exact format — wrong tool_use_id = 400 error
+{
+    "type": "tool_result",
+    "tool_use_id": tool.id,   # must match the tool call id
+    "content": str(result)
+}
+```
+
+### Force Structured Output
+
+```python
+response = client.messages.create(
+    tools=tools,
+    tool_choice={"type": "tool", "name": "submit_recommendation"},  # force specific tool
+    ...
+)
+recommendation = response.content[0].input  # guaranteed structured dict
+```
+
+### Area 5 Score: Borderline
+
+| Strong | Gap |
+|---|---|
+| Got iteration guard (range 10) | Missed model name |
+| Got cache_control ephemeral | Missed tool result format |
+| Understood the loop shape | Missed tool_use_id — causes 400 errors |
+
+**Most important thing to memorize:** `{"type": "tool_result", "tool_use_id": tool.id, "content": str(result)}`
+
+---
+
 ## Areas Remaining
 
 - [x] Area 1: System Design for Agentic Systems
 - [x] Area 2: Token Optimization and Cost Engineering
 - [x] Area 3: Security (prompt injection, sandboxing, secrets)
 - [x] Area 4: Observability and Debugging
-- [ ] Area 5: Platform-specific (Claude API)
+- [x] Area 5: Platform-specific (Claude API)
 - [ ] Area 6: Full mock debrief
 
 ---
