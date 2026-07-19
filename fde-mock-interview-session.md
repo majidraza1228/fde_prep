@@ -498,27 +498,6 @@ recommendation = response.content[0].input  # guaranteed structured dict
 
 ---
 
-## Reference Material
-
-| Topic | URL |
-|---|---|
-| Anthropic Docs (main) | https://docs.anthropic.com |
-| Tool Use Guide | https://docs.anthropic.com/en/docs/build-with-claude/tool-use |
-| Prompt Caching | https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching |
-| Models Overview | https://docs.anthropic.com/en/docs/about-claude/models |
-| Batch API | https://docs.anthropic.com/en/docs/build-with-claude/message-batches |
-| Pricing | https://anthropic.com/pricing |
-| OWASP LLM Top 10 (Security) | https://owasp.org/www-project-top-10-for-large-language-model-applications |
-
-**How to use these:**
-1. Read the doc for one concept
-2. Close it
-3. Write the code from memory
-4. Compare to the doc
-5. Repeat until it matches
-
----
-
 ## Key Rules to Memorize
 
 | Rule | Why |
