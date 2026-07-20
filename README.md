@@ -14,6 +14,7 @@ Each area is taught first, then tested. Gaps are scored honestly.
 |---|---|
 | [fde-mock-interview-session.md](fde-mock-interview-session.md) | Full study guide — code examples, scores, and key rules from each area |
 | [microsoft-azure-github.md](microsoft-azure-github.md) | Azure OpenAI, Managed Identity, Content Safety, GitHub Copilot, GitHub Actions |
+| [agent-loop-cheatsheet.md](agent-loop-cheatsheet.md) | Complete run_agent function — write this from memory daily |
 | [prompt-caching.md](prompt-caching.md) | Prompt caching deep dive — rules, best practices, cost examples, test questions |
 | [reference-material.md](reference-material.md) | Official docs and links for deeper reading |
 
