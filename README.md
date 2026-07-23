@@ -13,6 +13,7 @@ Each area is taught first, then tested. Gaps are scored honestly.
 | File | Description |
 |---|---|
 | [fde-mock-interview-session.md](fde-mock-interview-session.md) | Full study guide — code examples, scores, and key rules from each area |
+| [system-design-agentic.md](system-design-agentic.md) | System design deep dive — agent loop, orchestration, tools, failure modes, interview Q&A |
 | [microsoft-azure-github.md](microsoft-azure-github.md) | Azure OpenAI, Managed Identity, Content Safety, GitHub Copilot, GitHub Actions |
 | [agent-loop-cheatsheet.md](agent-loop-cheatsheet.md) | Complete run_agent function — write this from memory daily |
 | [prompt-caching.md](prompt-caching.md) | Prompt caching deep dive — rules, best practices, cost examples, test questions |
@@ -27,10 +28,11 @@ Each area is taught first, then tested. Gaps are scored honestly.
 - [x] Area 3: Security — Prompt Injection, Sandboxing, Secrets
 - [x] Area 4: Observability and Debugging
 - [x] Area 5: Platform-Specific — Claude API
-- [x] Area 6: Microsoft / Azure / GitHub Copilot
-- [x] Area 7: Prompt Caching — Deep Dive
-- [ ] Area 8: OpenAI API
-- [ ] Area 9: Kubernetes + AWS for AI Workloads
+- [x] Area 6: OpenAI Platform (Responses API, Structured Outputs, Batch API)
+- [x] Area 7: Microsoft / Azure / GitHub Copilot
+- [x] Area 8: Prompt Caching — Deep Dive
+- [x] Area 9: Interview Prep Guide (how to answer intro + design questions)
+- [ ] Area 10: Kubernetes + AWS for AI Workloads
 
 ---
 

@@ -6,6 +6,87 @@
 
 ---
 
+## Interview Prep Guide — How to Answer Questions
+
+### Intro Question Framework
+
+**"Tell me about a project where you built something with an LLM end-to-end."**
+
+Use this structure (2-3 min max):
+
+```
+1. Context     — what was the problem, who was the customer/user
+2. Architecture — what you built (tools, models, data flow)
+3. What broke  — a real failure (cost, latency, hallucination, tool loop)
+4. How you fixed it — specific technical decision
+5. Result      — metric or outcome
+```
+
+**What interviewers want to hear:**
+- You owned it end-to-end (not just "I wrote the prompt")
+- You hit a real production problem and debugged it
+- You know the cost/latency tradeoffs you made
+- You can explain it to a non-technical person AND a senior engineer
+
+**What kills answers:**
+- "It worked great, no issues" — no one believes this
+- Vague stack ("I used an LLM to do X") — name the model, the SDK, the tools
+- No metrics — how do you know it worked?
+
+---
+
+### System Design Answer Structure
+
+Always open with clarifying questions — this is the #1 FDE signal:
+
+```
+1. Clarify requirements (data sensitivity? latency? cost budget? volume?)
+2. Draw the data flow (user → orchestrator → tools → response)
+3. Name failure modes and how you'd handle each
+4. Add observability from the start (don't bolt it on)
+5. Mention cost — what model tier, caching, batching
+```
+
+### Cost Reduction Answer Frame
+
+When asked "reduce cost by 80%":
+
+```
+1. Measure first — log tokens in/out per step, find the expensive steps
+2. Cache the system prompt if static
+3. Tier the model — is Opus really needed here?
+4. Trim context — what in the history is actually needed?
+5. Batch if async — does this need to be real-time?
+6. Compress tool results before passing back to model
+```
+
+### Token Optimization Mental Model
+
+Every token is money. Every round-trip is latency. Optimize both.
+
+| Lever | How it saves cost |
+|---|---|
+| Prompt caching | Claude: cache system prompts >1024 tokens (90% discount). OpenAI: similar |
+| Model tiering | Haiku/GPT-4o-mini for routing. Sonnet/GPT-4o for reasoning. Opus only when needed |
+| Batching | Async batch API = 50% cheaper for non-real-time work |
+| Context trimming | Summarize old turns instead of passing full history |
+| Output control | `max_tokens`, structured outputs to prevent verbose free-text |
+| Tool efficiency | Consolidate tools, avoid unnecessary round-trips |
+
+---
+
+### Daily Practice Checklist
+
+Write these from memory every day:
+
+1. Full `run_agent` function with correct tool result format
+2. The 6 things to log on every API call
+3. The 5 token cost reduction techniques
+4. CISO prompt injection explanation (plain English)
+5. Model tiering decision: Haiku vs Sonnet vs Opus
+
+---
+
 ## Area 1: System Design for Agentic Systems
 
 ### What is an Agent?
@@ -487,6 +568,154 @@ recommendation = response.content[0].input  # guaranteed structured dict
 
 ---
 
+## Area 6: OpenAI Platform
+
+### Responses API vs Chat Completions
+
+Use **Responses API** for multi-turn agents — it manages state server-side:
+
+```python
+from openai import OpenAI
+client = OpenAI()
+
+# First turn
+response = client.responses.create(
+    model="gpt-4o",
+    input="Analyze this portfolio",
+    tools=tools
+)
+response_id = response.id  # save this
+
+# Next turn — pass previous_response_id instead of full history
+response2 = client.responses.create(
+    model="gpt-4o",
+    input="Now compare it to last month",
+    previous_response_id=response_id
+)
+```
+
+**Rule:** Responses API > Chat Completions for stateful agent flows. Chat Completions requires you to manage message history manually.
+
+---
+
+### Structured Outputs (JSON Schema enforcement)
+
+```python
+from pydantic import BaseModel
+
+class Recommendation(BaseModel):
+    action: str       # "buy" | "sell" | "hold"
+    ticker: str
+    percentage: float
+    rationale: str
+
+response = client.responses.parse(
+    model="gpt-4o",
+    input="Analyze AAPL and recommend an action",
+    text_format=Recommendation
+)
+
+rec = response.output_parsed  # guaranteed Recommendation object
+print(rec.action, rec.ticker)
+```
+
+**Rule:** Always use Structured Outputs for reliable parsing — never parse free text from an LLM.
+
+---
+
+### Batch API (50% cheaper, async)
+
+```python
+import json
+
+# Build batch file
+requests = []
+for portfolio in portfolios:
+    requests.append({
+        "custom_id": portfolio["id"],
+        "method": "POST",
+        "url": "/v1/chat/completions",
+        "body": {
+            "model": "gpt-4o-mini",
+            "messages": [{"role": "user", "content": f"Classify: {portfolio['data']}"}],
+            "max_tokens": 100
+        }
+    })
+
+# Write to JSONL file
+with open("batch_input.jsonl", "w") as f:
+    for r in requests:
+        f.write(json.dumps(r) + "\n")
+
+# Upload and submit
+batch_file = client.files.create(file=open("batch_input.jsonl", "rb"), purpose="batch")
+batch = client.batches.create(
+    input_file_id=batch_file.id,
+    endpoint="/v1/chat/completions",
+    completion_window="24h"
+)
+print(f"Batch ID: {batch.id}")  # poll later
+```
+
+**When to use:** Any non-real-time job — nightly classification, bulk summarization, overnight analysis.
+
+---
+
+### Rate Limit Handling
+
+```python
+import time
+from openai import RateLimitError
+
+def call_with_retry(messages, max_retries=5):
+    for attempt in range(max_retries):
+        try:
+            return client.chat.completions.create(
+                model="gpt-4o",
+                messages=messages
+            )
+        except RateLimitError:
+            wait = 2 ** attempt  # exponential backoff: 1s, 2s, 4s, 8s, 16s
+            time.sleep(wait)
+    raise Exception("Max retries hit on rate limit")
+```
+
+---
+
+### Model Tiering — OpenAI
+
+| Model | Use for |
+|---|---|
+| `gpt-4o-mini` | Routing, classification, simple extraction |
+| `gpt-4o` | Main agent reasoning, complex analysis |
+| `o3` / `o4-mini` | Hard multi-step reasoning, math, code |
+
+---
+
+### OpenAI vs Claude — Key Differences
+
+| | Claude | OpenAI |
+|---|---|---|
+| State management | You manage messages | Responses API manages it |
+| Tool result format | `tool_result` block with `tool_use_id` | `tool` role message |
+| Prompt caching | `cache_control: ephemeral` | Automatic (last 128k tokens) |
+| Structured output | Tool use + `tool_choice` | `text_format` with Pydantic |
+| Batch API | `client.messages.batches.create()` | File upload → batch create |
+
+---
+
+### Area 6 Key Rules
+
+| Rule | Why |
+|---|---|
+| Use Responses API for agents | Manages turn state server-side |
+| Always use Structured Outputs | Eliminates free-text parsing failures |
+| Use gpt-4o-mini for routing | 10x cheaper than gpt-4o for simple tasks |
+| Exponential backoff on RateLimitError | Rate limits are common at scale |
+| Batch API for async workloads | 50% cost reduction, no latency pressure |
+
+---
+
 ## Areas Remaining
 
 - [x] Area 1: System Design for Agentic Systems
@@ -494,7 +723,11 @@ recommendation = response.content[0].input  # guaranteed structured dict
 - [x] Area 3: Security (prompt injection, sandboxing, secrets)
 - [x] Area 4: Observability and Debugging
 - [x] Area 5: Platform-specific (Claude API)
-- [ ] Area 6: Full mock debrief
+- [x] Area 6: OpenAI Platform
+- [x] Area 7: Microsoft / Azure / GitHub (see microsoft-azure-github.md)
+- [x] Area 8: Prompt Caching Deep Dive (see prompt-caching.md)
+- [ ] Area 9: Kubernetes + AWS for AI Workloads
+- [ ] Area 10: Full mock debrief
 
 ---
 
