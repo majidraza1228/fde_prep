@@ -731,6 +731,64 @@ def call_with_retry(messages, max_retries=5):
 
 ---
 
+## Session 2 — 2026-07-23 (Interleaved Deep Dive)
+
+### Area 1 Mock — Agent Loop
+
+| What you got right | Gap |
+|---|---|
+| Correct concept: LLM → tool → feedback → loop | Syntax gaps throughout |
+| Got `end_turn` stop_reason | Said `max_iter` as second stop_reason — it's `tool_use` |
+| Got `response.content[0].text` for return | Model name: said 4.5, correct is claude-sonnet-4-6 |
+| Got `for i in range(max_iter)` guard | Missing `max_tokens` on API call |
+| | Couldn't write tool result format independently |
+| | Couldn't write `tool_use` branch without scaffolding |
+
+**Still the #1 gap: tool result format** — must memorize:
+```python
+{"type": "tool_result", "tool_use_id": tool.id, "content": str(result)}
+```
+
+**Next session picks up:** Area 2 mock Q2 onwards → Area 3 Deep Dive → mock Area 3 → Full mock
+
+---
+
+## Session 2 — Area 2 Progress (Token Optimization)
+
+### Content covered
+- 6 cost levers: prompt caching, model tiering, batch API, max_tokens, structured outputs, context trimming
+- Prompt caching rules: 1024 token minimum, 10% hit cost, 5min TTL, prefix rule
+- Cost math: 10,000 runs × 2,000 token system prompt × Sonnet $3/M = $60/day without cache, ~$6/day with cache = $54/day saved (90%)
+- How to verify cache hit: `cache_read_input_tokens > 0`
+
+### Area 2 Mock — Q1 Result
+
+| What you got right | Gap |
+|---|---|
+| Knew caching saves ~10x (90%) | Couldn't show the math step by step |
+| Right instinct | Said $1.25 — wrong number, right direction |
+
+**The math to memorize:**
+```
+Without: tokens × runs × price/M
+With:    pay once + 10% on rest
+Saving:  ~90% on cached tokens
+Example: $60/day → $6/day = $54 saved = ~$1,600/month
+```
+
+### Area 2 Mock — Q2 (not answered yet)
+"You have 3 steps — classify, analyze, generate report. Which model for each and why?"
+
+**Answer to study:**
+```
+Classify  → Haiku   (simple routing, ~10x cheaper than Sonnet)
+Analyze   → Sonnet  (main reasoning work)
+Report    → Sonnet  (generation, Opus overkill unless legal/compliance)
+```
+Rule: match model complexity to task complexity. Never use Opus where Sonnet works.
+
+---
+
 ## Key Rules to Memorize
 
 | Rule | Why |
