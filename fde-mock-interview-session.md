@@ -6,6 +6,59 @@
 
 ---
 
+## FDE Interview Process — 2026 Overview
+
+### What Makes FDE Different from SWE Interviews
+
+~50% of the process is **case studies, stakeholder scenarios, and business judgment** — not coding. Evaluated equally on:
+- Technical depth (build and ship)
+- Customer-facing judgment (translate problems, handle blockers)
+- Reasoning through ambiguity out loud
+
+### Typical Rounds (4–6 rounds, 3–6 weeks)
+
+| Round | Format | What They're Testing |
+|---|---|---|
+| Recruiter screen | 30 min | Background, motivation, culture fit |
+| Technical screen | Coding / HackerRank | Can you ship working code? |
+| Take-home project | ~5 hours | Build something with their API |
+| Take-home walkthrough | 60 min | Explain decisions, handle pushback |
+| Onsite (3–4 hrs) | Multiple rounds | Design, case study, stakeholder |
+| Hiring manager | Final | Synthesis of everything |
+
+### Company-Specific Shapes
+
+**Palantir:**
+- Onsite pulls from: decomposition, learning, coding, re-engineering, system design (not all candidates see same combo)
+- At least 1 coding (Python), 1 system design/data architecture, 1–2 behavioral
+- **No AI tools allowed** during interview
+- Signature: ambiguous case study → decompose into a plan
+
+**OpenAI:**
+- Take-home: build something on OpenAI APIs (~5 hrs)
+- Onsite: hiring manager + second technical + design/case study
+- Heavy weight on customer judgment and solution architecture
+
+**Scale AI / ElevenLabs / Google:**
+- Presentation round: given a messy dataset, build a prototype, pitch to a skeptical panel
+
+### The Round Most Candidates Fail: The Case Study
+
+- **45–60 min**, ambiguous customer problem handed to you cold
+- ~40% pass rate, ~30% of total hiring weight
+- What they want: structured decomposition → clarifying questions → prioritize → plan with tradeoffs
+- What kills candidates: jumping to solution without scoping, or going silent
+
+### Core Skill Areas to Prepare
+
+1. **Coding** — Python, API integration, data transformation, debugging
+2. **System design** — agent/LLM architectures under customer constraints (VPC, compliance, data residency)
+3. **Customer scenarios** — unblock IT restrictions, explain AI risks to a CISO, handle scope creep
+4. **Token/cost optimization** — production cost engineering (see Area 2)
+5. **Behavioral** — ownership, conflict, shipping under ambiguity
+
+---
+
 ## Interview Prep Guide — How to Answer Questions
 
 ### Intro Question Framework
@@ -224,18 +277,36 @@ When designing an agent system, always cover:
 
 ## Area 2: Token Optimization and Cost Engineering
 
-### Pricing Reference
+### The Mental Model (say this first in any interview answer)
 
-| Model | Input | Output |
-|---|---|---|
-| Claude Haiku 4.5 | ~$0.80/M tokens | ~$4/M tokens |
-| Claude Sonnet 4.6 | ~$3/M tokens | ~$15/M tokens |
-| Claude Opus 4.7 | ~$15/M tokens | ~$75/M tokens |
+> "Token optimization is a context-engineering problem, not a prompt-shortening problem. Most teams waste time making prompts shorter when the real cost drivers are bloated context, idle tool schemas, and stale conversation history."
 
-### Technique 1: Prompt Caching
+Five levers, in order of impact:
+1. **Prompt caching** — highest single lever, up to 90% off
+2. **Model tiering** — route cheap tasks to cheap models
+3. **Batch processing** — 50% off for async workloads
+4. **Context management** — cut what doesn't need to be there
+5. **Output control** — cap length, use structured outputs
 
-Cache static system prompts — pay once instead of 10,000 times:
+---
 
+### Pricing Reference (2026)
+
+| Model | Input | Cached Input | Output |
+|---|---|---|---|
+| Claude Haiku 4.5 | ~$0.80/M | ~$0.08/M | ~$4/M |
+| Claude Sonnet 4.6 | ~$3/M | ~$0.30/M | ~$15/M |
+| Claude Opus 4.7 | ~$15/M | ~$1.50/M | ~$75/M |
+| GPT-4o-mini | ~$0.15/M | auto | ~$0.60/M |
+| GPT-4o | ~$2.50/M | auto | ~$10/M |
+
+---
+
+### Technique 1: Prompt Caching (Highest Impact)
+
+Cache static system prompts — pay once instead of 10,000 times. Cache hits cost ~10% of normal price (90% discount).
+
+**Claude — explicit cache control:**
 ```python
 response = client.messages.create(
     model="claude-sonnet-4-6",
@@ -243,31 +314,76 @@ response = client.messages.create(
         {
             "type": "text",
             "text": "You are a wealth management analyst...",
-            "cache_control": {"type": "ephemeral"}  # cache this
+            "cache_control": {"type": "ephemeral"}  # must be >1024 tokens to qualify
         }
     ],
     messages=[{"role": "user", "content": f"Analyze: {portfolio_data}"}]
 )
+
+# Verify cache hit
+cache_hit = response.usage.cache_read_input_tokens > 0
 ```
 
-**Rule:** Cache any text over 1024 tokens that doesn't change between runs. Cache hits cost ~10% of normal price.
+**OpenAI — automatic (no code needed):**
+```python
+# OpenAI caches the last 128k tokens automatically
+# No cache_control flag needed — just ensure static prefix is consistent
+response = client.chat.completions.create(
+    model="gpt-4o",
+    messages=messages  # static system prompt at top = auto-cached
+)
+```
+
+**Cache rules to memorize:**
+- Claude: minimum 1024 tokens, TTL = 5 minutes, must be at prefix (not middle)
+- OpenAI: minimum 1024 tokens, cached automatically on repeated prefixes
+- Only the static part gets cached — variable user data must come after
+- Cache hit savings: ~90% on cached tokens
+
+**The cost math (memorize for interviews):**
+```
+Scenario: 10,000 runs/day, 2,000 token system prompt, Sonnet pricing
+
+Without cache:  10,000 × 2,000 × $3/M = $60/day  → $1,800/month
+With cache:     pay full once + 10% on 9,999 hits  → ~$6/day  → $180/month
+Saving:         ~$54/day = ~$1,620/month (90% reduction)
+```
+
+---
 
 ### Technique 2: Model Tiering
 
+Route each task to the cheapest model that can handle it. Never use Opus where Sonnet works.
+
 ```python
-def route_request(task_type):
-    if task_type == "classify":         # simple yes/no decisions
-        return "claude-haiku-4-5-20251001"
-    elif task_type == "analyze":        # main agent work
-        return "claude-sonnet-4-6"
-    elif task_type == "complex_legal":  # hardest reasoning only
-        return "claude-opus-4-7"
+def route_request(task_type: str) -> str:
+    routing = {
+        "classify":      "claude-haiku-4-5-20251001",   # simple yes/no, labels
+        "extract":       "claude-haiku-4-5-20251001",   # pull fields from text
+        "summarize":     "claude-sonnet-4-6",           # needs nuance
+        "analyze":       "claude-sonnet-4-6",           # main agent reasoning
+        "complex_legal": "claude-opus-4-7",             # only when justified
+    }
+    return routing.get(task_type, "claude-sonnet-4-6")
 ```
 
-**Interview answer:** "Haiku for routing/filtering, Sonnet for main work, Opus only when necessary."
+**Cost impact of tiering:**
 
-### Technique 3: Batch API (50% cheaper)
+| Pipeline step | Wrong model | Right model | Saving |
+|---|---|---|---|
+| Classify (10k docs) | Sonnet: $60 | Haiku: $8 | ~87% |
+| Analyze (10k docs) | Opus: $150 | Sonnet: $30 | ~80% |
+| Generate report | Opus: $75 | Sonnet: $15 | ~80% |
 
+**Interview answer:** "Haiku for routing/filtering/extraction, Sonnet for main reasoning, Opus only when the task genuinely requires it — usually complex legal, compliance, or multi-hop reasoning."
+
+---
+
+### Technique 3: Batch API (50% cheaper, async)
+
+For any non-real-time workload — nightly jobs, bulk classification, offline analysis.
+
+**Claude batch:**
 ```python
 requests = []
 for portfolio in portfolios:
@@ -281,56 +397,180 @@ for portfolio in portfolios:
     })
 
 batch = client.messages.batches.create(requests=requests)
-print(f"Batch ID: {batch.id}")  # poll later for results
+print(f"Batch ID: {batch.id}")  # poll for results — not real-time
 ```
 
-**When to use:** Any non-real-time job — nightly reports, bulk classification, offline analysis.
+**OpenAI batch:**
+```python
+import json
 
-### Technique 4: Control Output Length
+requests = []
+for portfolio in portfolios:
+    requests.append({
+        "custom_id": portfolio["id"],
+        "method": "POST",
+        "url": "/v1/chat/completions",
+        "body": {
+            "model": "gpt-4o-mini",
+            "messages": [{"role": "user", "content": f"Classify: {portfolio['data']}"}],
+            "max_tokens": 100
+        }
+    })
+
+with open("batch_input.jsonl", "w") as f:
+    for r in requests: f.write(json.dumps(r) + "\n")
+
+batch_file = client.files.create(file=open("batch_input.jsonl", "rb"), purpose="batch")
+batch = client.batches.create(
+    input_file_id=batch_file.id,
+    endpoint="/v1/chat/completions",
+    completion_window="24h"
+)
+```
+
+**Cost impact:** Sonnet $3/M → $1.50/M with batch. On 10M tokens that's $15,000 saved.
+
+---
+
+### Technique 4: Context Management
+
+The most common hidden cost — passing more tokens than needed in every turn.
+
+**What to cut:**
+- Old conversation turns (summarize instead of keep)
+- Full tool results (trim to relevant fields only)
+- Redundant tool definitions (only include tools the agent needs for this step)
+- Stale examples in few-shot prompts (rotate or remove)
+
+```python
+def trim_messages(messages: list, keep_last_n: int = 6) -> list:
+    if len(messages) <= keep_last_n:
+        return messages
+    # always keep system message + last N turns
+    return messages[:1] + messages[-keep_last_n:]
+
+def compress_tool_result(result: dict, max_chars: int = 500) -> str:
+    text = str(result)
+    return text[:max_chars] + "..." if len(text) > max_chars else text
+```
+
+**The layered caching approach (2026 production standard):**
+
+| Cache layer | What it stores | Hit rate |
+|---|---|---|
+| Exact-match cache | Identical queries → same response | Low, high value |
+| Semantic cache | Similar queries → reuse response | Medium |
+| Prefix cache (Claude/OpenAI) | Static system prompt tokens | High on repeated callers |
+
+Instrument hit rate per layer — that's where you find the savings.
+
+---
+
+### Technique 5: Output Control
 
 ```python
 response = client.messages.create(
     model="claude-sonnet-4-6",
-    max_tokens=512,  # cap output — don't let it write an essay
+    max_tokens=512,        # hard cap — don't let it write an essay
     messages=messages
 )
 ```
 
-### Technique 5: Structured Outputs
-
-Shorter and cheaper than free text:
+**Force structured output (shorter + more reliable than free text):**
 
 ```python
-# Instead of asking for a paragraph, force structured output via tool:
-{
+# Tool-use approach (Claude)
+tools = [{
     "name": "rebalancing_recommendation",
     "input_schema": {
         "type": "object",
         "properties": {
             "action": {"type": "string", "enum": ["buy", "sell", "hold"]},
             "ticker": {"type": "string"},
-            "percentage": {"type": "number"}
-        }
+            "percentage": {"type": "number"},
+            "rationale": {"type": "string"}
+        },
+        "required": ["action", "ticker", "percentage"]
     }
-}
+}]
+
+response = client.messages.create(
+    tools=tools,
+    tool_choice={"type": "tool", "name": "rebalancing_recommendation"},
+    ...
+)
 ```
 
-### Technique 6: Trim the Context
+A 3-field structured output costs far fewer tokens than a 3-paragraph prose response covering the same content.
+
+---
+
+### Full Cost Reduction Playbook (interview answer for "reduce costs by 80%")
+
+```
+Step 1: Measure — log tokens_in + tokens_out per pipeline step, find the top spenders
+Step 2: Cache — add cache_control to any static system prompt > 1024 tokens
+Step 3: Tier — move classification/routing steps to Haiku or gpt-4o-mini
+Step 4: Batch — shift any non-real-time work to batch API (50% off)
+Step 5: Trim context — summarize old turns, compress tool results, drop idle tool schemas
+Step 6: Cap output — set max_tokens, use structured outputs instead of free text
+Step 7: Monitor — alert on cost-per-run anomalies before the bill arrives
+```
+
+Realistic combined savings: **80–90%** vs. naive implementation.
+
+---
+
+### Production Cost Monitoring
+
+Always instrument before optimizing — measure then cut.
 
 ```python
-def trim_messages(messages, keep_last_n=6):
-    if len(messages) > keep_last_n:
-        return messages[-keep_last_n:]
-    return messages
+import logging, time
+
+def call_claude_tracked(messages, tools, run_id: str):
+    start = time.time()
+    response = client.messages.create(
+        model="claude-sonnet-4-6",
+        max_tokens=1024,
+        tools=tools,
+        messages=messages
+    )
+    latency = round((time.time() - start) * 1000)
+
+    input_cost  = response.usage.input_tokens  * 3 / 1_000_000   # Sonnet pricing
+    output_cost = response.usage.output_tokens * 15 / 1_000_000
+    cache_saved = response.usage.cache_read_input_tokens * (3 * 0.9) / 1_000_000
+
+    logging.info({
+        "run_id": run_id,
+        "input_tokens": response.usage.input_tokens,
+        "output_tokens": response.usage.output_tokens,
+        "cache_hit_tokens": response.usage.cache_read_input_tokens,
+        "cost_usd": round(input_cost + output_cost, 6),
+        "cache_saved_usd": round(cache_saved, 6),
+        "latency_ms": latency,
+        "stop_reason": response.stop_reason
+    })
+    return response
 ```
+
+**Alert thresholds to set:**
+- `cost_per_run > 2× baseline` → spike alert
+- `cache_hit_tokens == 0` for > 100 runs → cache broke
+- `input_tokens > 80% of context limit` → context overflow risk
+
+---
 
 ### What Interviewers Want to Hear on Cost
 
-1. Prompt caching — `cache_control`, saves ~90% on repeated system prompts
-2. Model tiering — Haiku → Sonnet → Opus based on task complexity
-3. Batch API — 50% savings for async workloads
-4. `max_tokens` — cap output length
-5. Structured outputs — shorter and more reliable than free text
+1. **Measure first** — you don't optimize what you haven't measured
+2. **Prompt caching** — `cache_control: ephemeral`, saves ~90% on repeated system prompts
+3. **Model tiering** — Haiku → Sonnet → Opus matched to task complexity
+4. **Batch API** — 50% savings for non-real-time work
+5. **Context management** — trim turns, compress tool results, drop idle schemas
+6. **Output control** — `max_tokens` + structured outputs
+7. **Monitor in production** — cost-per-run alerting, cache hit rate per layer
 
 ---
 
