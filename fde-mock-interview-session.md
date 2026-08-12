@@ -1279,3 +1279,35 @@ Tokens are not words — they're sub-word chunks the model actually processes.
 **FDE context:** You always work at inference time. When a customer asks "can we train it on our data?" — they usually mean fine-tuning. Clarify: do they want behavior change (fine-tune) or knowledge retrieval (RAG)?
 
 ---
+
+### RAG vs Fine-Tuning — Reference Resources
+
+**The one line to remember (2026 production consensus):**
+> "Put volatile knowledge in retrieval. Put stable behavior in fine-tuning. Stop trying to force one tool to do both jobs."
+
+**Key distinction:**
+- RAG changes what the model can **see** right now
+- Fine-tuning changes how the model **behaves** every time
+- RAG consistently outperforms fine-tuning for factual recall
+- Hybrid (RAG + fine-tuning) is the production default for high-quality systems
+
+**Articles (read in this order):**
+
+| Resource | Why |
+|---|---|
+| [RAG vs Fine-Tuning: What Actually Works in Production — DEV Community](https://dev.to/umesh_malik/rag-vs-fine-tuning-for-llms-2026-what-actually-works-in-production-10if) | Production-focused, closest to FDE interview context |
+| [RAG vs Fine-Tuning 2026 Decision Framework — Winder.AI](https://winder.ai/rag-vs-fine-tuning-2026-decision-framework/) | Has a decision tree you can memorize |
+| [Fine-Tuning vs RAG Key Differences — orq.ai](https://orq.ai/blog/finetuning-vs-rag) | Clean, concise — good for one-liner interview answers |
+| [When RAG Isn't Enough — BigData Boutique](https://bigdataboutique.com/blog/fine-tuning-llms-when-rag-isnt-enough) | Covers hybrid approach — when to layer both |
+| [Fine-Tuning vs RAG vs Prompt Engineering — Kunal Ganglani](https://www.kunalganglani.com/blog/fine-tuning-vs-rag-prompt-engineering) | Adds prompt engineering as a third option — interviewers ask this too |
+
+**YouTube (watch in this order):**
+
+| Video | Why |
+|---|---|
+| [RAG vs Fine Tuning vs Prompt Engineering](https://www.youtube.com/watch?v=Q-_D_2NWECE) | Start here — covers all three with intuitive language |
+| [RAG vs Fine-Tuning: Enterprise AI Strategy](https://www.youtube.com/watch?v=jACpkPNXvS8) | Enterprise framing — maps directly to FDE customer conversations |
+| [RAG vs Fine-Tuning: Which One Should You Use?](https://www.youtube.com/watch?v=G_DEgwmGcd8) | Good for consolidating mental model after reading |
+| [RAG vs Fine Tuning](https://www.youtube.com/watch?v=00Q0G84kq3M) | Short, focused — quick refresher before an interview |
+
+---
