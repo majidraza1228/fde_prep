@@ -1,8 +1,81 @@
-# FDE Mock Interview Session
-**Role:** Forward Deployed Engineer  
+# FDE & PM Interview Prep
+**Roles:** Forward Deployed Engineer | Product Manager (AI-native companies)
 **Date:** 2026-07-18  
 **Format:** Full mock, coding-heavy, all areas  
 **Mode:** Learn then test (Option A)
+
+---
+
+## PM Interview Process — 2026 Overview
+
+### What Makes AI PM Different
+
+PMs at AI-native companies (Anthropic, OpenAI, Palantir) are expected to have **technical fluency** — not coding, but you must be able to discuss hallucination mitigation, RAG, token/latency tradeoffs, and model evaluation in plain product language. Questions about evals, RAG, and token cost turn up inside ordinary product rounds — often not labeled "technical" at all.
+
+### Typical Rounds (5–12 conversations, 6–10 weeks)
+
+| Round | Format | What They're Testing |
+|---|---|---|
+| Recruiter screen | 30–45 min | Background, motivation, hardest launches, biggest failures |
+| Hiring manager | 45–60 min | Products you've led, past failures, judgment |
+| Product/business case | 60 min | Ambiguous prompt → structure → recommendation |
+| Cross-functional panel | 60 min | Coordination, tradeoffs, stakeholder alignment |
+| Product sense | 60 min | North star metric, conflicting metrics, prioritization |
+| Execution round | 60 min | Launch plan, go-to-market, eng collaboration |
+| Culture/values | 45 min | Ethics, safety judgment, defending your beliefs |
+
+### Company-Specific Shapes
+
+**Anthropic PM:**
+- Standalone culture interview (45 min) — tests safety conviction, how you defend beliefs under pressure
+- Weighs values and safety judgment more heavily than any other big-tech PM loop
+- Know their system cards, eval methodology, and responsible scaling policy
+- Have an answer ready: "Tell me about a feature you decided NOT to build and why"
+
+**OpenAI PM:**
+- Up to 12 conversations across 5 stages — longest loop in the industry
+- Product sense prompts compressed into a single ambiguous sentence — you must ask clarifying questions
+- Execution rounds: 8-word brief, you fill in the rest
+- Borrows Meta's PM framework but execution is faster-paced
+
+**Palantir PM:**
+- Heavy emphasis on enterprise customer workflows — same as FDE
+- Expect a case study with a messy dataset and a skeptical panel
+- Must demonstrate you can translate business problems into product requirements
+
+### The Round Most Candidates Fail: Product/Business Case
+
+- Handed a vague problem cold — often one sentence
+- What they want: clarifying questions first → define the user → identify the metric → prioritize → recommend with tradeoffs
+- What kills candidates: jumping to solution, not defining success, ignoring constraints
+
+### Core Skill Areas for AI PM
+
+1. **Product sense** — north star metric, conflicting metrics, user segmentation
+2. **Technical fluency** — RAG, hallucinations, evals, token cost, latency (no coding required)
+3. **Execution** — launch plan, go-to-market, cross-functional coordination
+4. **Strategy** — build vs buy, make vs partner, prioritization frameworks
+5. **Safety/ethics** — when NOT to ship, responsible AI tradeoffs
+
+### Key PM Interview Questions (AI-native companies)
+
+- "Define the north star metric for Claude's API product"
+- "DAU is up but user satisfaction is down — what do you do?"
+- "How would you evaluate whether a new LLM feature is working?"
+- "Tell me about a feature you decided not to build"
+- "How do you prioritize between safety and shipping speed?"
+- "Design an AI product for X — what's your biggest risk?"
+- "How would you explain hallucination rate to a non-technical executive?"
+
+### PM vs FDE — Where They Overlap
+
+| Skill | FDE | PM |
+|---|---|---|
+| Customer scenarios | On-site, technical implementation | Discovery, requirements, stakeholder alignment |
+| Technical fluency | Write the code | Explain the tradeoffs |
+| RAG vs fine-tuning | Architect and deploy | Decide which to build and why |
+| Cost/token optimization | Implement the savings | Define the cost budget and metrics |
+| Stakeholder comms | CISO, IT team, on-site | Exec, engineering, sales, legal |
 
 ---
 
@@ -1040,7 +1113,7 @@ Rule: match model complexity to task complexity. Never use Opus where Sonnet wor
 
 ---
 
-## Foundational Concepts — FDE Must Know
+## Foundational Concepts — FDE & PM Must Know
 
 ### Model vs Harness
 
@@ -1309,5 +1382,133 @@ Tokens are not words — they're sub-word chunks the model actually processes.
 | [RAG vs Fine-Tuning: Enterprise AI Strategy](https://www.youtube.com/watch?v=jACpkPNXvS8) | Enterprise framing — maps directly to FDE customer conversations |
 | [RAG vs Fine-Tuning: Which One Should You Use?](https://www.youtube.com/watch?v=G_DEgwmGcd8) | Good for consolidating mental model after reading |
 | [RAG vs Fine Tuning](https://www.youtube.com/watch?v=00Q0G84kq3M) | Short, focused — quick refresher before an interview |
+
+---
+
+## PM-Specific Prep — Frameworks & Answer Structures
+
+### Product Sense Answer Structure
+
+Use this for any "design a product" or "improve X" question:
+
+```
+1. Clarify — who is the user, what's the context, what does success look like?
+2. User segments — who are the different types of users, which matters most?
+3. Pain points — what problems do they have today?
+4. Solutions — 3 ideas, different risk/effort levels
+5. Prioritize — pick one, explain why (impact vs effort, risk, strategic fit)
+6. Metrics — how do you know it worked? (north star + guardrail)
+7. Risks — what could go wrong?
+```
+
+### North Star Metric Framework
+
+Every AI product has a north star metric. Know how to define one:
+
+```
+North star = the single number that best captures value delivered to users
+
+Bad:  "DAU" (activity, not value)
+Good: "Tasks completed successfully per user per week"
+
+For Claude API:    "Successful API calls that led to user action"
+For a PM tool:     "Decisions made using AI-generated insight per user per week"
+For a legal AI:    "Hours saved per lawyer per week on document review"
+```
+
+Conflicting metrics scenario (most common exec interview question):
+> "DAU is up 20% but user satisfaction score is down 15%. What do you do?"
+
+```
+Answer structure:
+1. Don't panic — one metric up + one down is normal, not a crisis
+2. Segment: which users drove the DAU spike? New or existing?
+3. Hypothesize: are new users lower-quality (trial, bot)? Or is the product actually worse?
+4. Investigate: look at retention cohort, session depth, support tickets
+5. Decide: if new users are low-quality, tighten acquisition. If product regressed, roll back.
+```
+
+### AI Product Metrics to Know
+
+| Metric | What it measures | Why it matters |
+|---|---|---|
+| Hallucination rate | % of responses with factual errors | Trust and safety |
+| Refusal rate | % of requests the model declines | Too restrictive = bad UX |
+| Task completion rate | % of sessions where user got what they needed | Core value delivery |
+| Latency (p50/p95) | Response time | UX and cost |
+| Cost per successful task | $ spent per value delivered | Unit economics |
+| Cache hit rate | % of tokens served from cache | Cost efficiency |
+| Eval pass rate | % of outputs that pass automated quality checks | Regression detection |
+
+### Prioritization Framework (RICE or Weighted Scorecard)
+
+When asked "how do you prioritize?":
+
+```
+RICE score = (Reach × Impact × Confidence) / Effort
+
+Reach:      How many users affected per quarter?
+Impact:     How much does it move the north star? (1=minimal, 3=massive)
+Confidence: How sure are you? (50%/80%/100%)
+Effort:     Person-months to ship
+
+Higher score = higher priority
+```
+
+For AI features, add a **risk multiplier** — features that touch model output need safety review, which adds effort and risk.
+
+### Build vs Buy vs Partner (common PM strategy question)
+
+| Situation | Recommendation |
+|---|---|
+| Core differentiator | Build — owning it is the moat |
+| Commodity infrastructure | Buy — don't rebuild what exists |
+| Needs specialized expertise you lack | Partner — speed over control |
+| Regulated or sensitive data | Build or private deployment — not third-party SaaS |
+
+### Safety/Ethics Questions (Anthropic-specific)
+
+Anthropic PM interviews always include a values/safety question. Prepare for:
+
+- "Tell me about a feature you decided not to ship and why"
+- "How do you balance user demand with potential harm?"
+- "What would you do if engineering wanted to ship something you thought was risky?"
+
+**Answer frame:**
+```
+1. Name the tension explicitly — don't pretend it's easy
+2. State your decision criteria (who could be harmed? how severely? how likely?)
+3. Describe the process (who did you consult? what data did you look at?)
+4. Own the decision — don't hide behind "the committee decided"
+5. Reflect on what you'd do differently
+```
+
+### PM Reference Resources
+
+| Resource | Why |
+|---|---|
+| [Anthropic PM Interview Guide — Exponent](https://www.tryexponent.com/guides/anthropic-product-manager-interview) | Anthropic-specific rounds and questions |
+| [OpenAI PM Interview Guide — Exponent](https://www.tryexponent.com/guides/openai-product-manager-interview) | OpenAI-specific structure and what they test |
+| [AI PM Interview Questions — IGotAnOffer](https://igotanoffer.com/en/advice/ai-product-manager-interview) | 50+ questions with answer breakdowns |
+| [Technical PM Interview Questions — Exponent](https://www.tryexponent.com/blog/technical-product-manager-interview-questions) | Technical fluency questions without requiring code |
+| [AI PM Interview Questions 2026 — KORE1](https://www.kore1.com/ai-product-manager-interview-questions-2026/) | AI-specific question bank |
+
+---
+
+## Daily Practice Checklist — FDE + PM
+
+**FDE daily (write from memory):**
+1. Full `run_agent` function with correct tool result format
+2. The 6 things to log on every API call
+3. The 5 token cost reduction techniques
+4. CISO prompt injection explanation (plain English)
+5. Model tiering decision: Haiku vs Sonnet vs Opus
+
+**PM daily (say out loud):**
+1. North star metric for one AI product (pick a different one each day)
+2. The RAG vs fine-tuning one-liner
+3. A prioritization decision with RICE scores
+4. One answer to "tell me about a feature you decided not to build"
+5. The conflicting metrics answer structure
 
 ---
