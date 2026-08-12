@@ -1,4 +1,4 @@
-# FDE Interview — Reference Material
+# FDE & PM Interview — Reference Material
 
 ## Claude / Anthropic
 
@@ -16,6 +16,12 @@
 | Topic | URL |
 |---|---|
 | OWASP LLM Top 10 | https://owasp.org/www-project-top-10-for-large-language-model-applications |
+
+## Industry Verticals
+
+| Vertical | File |
+|---|---|
+| Asset Management & Hedge Funds | `asset-management-hedgefunds.md` |
 
 ## How to Study
 
