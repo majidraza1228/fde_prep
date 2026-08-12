@@ -1037,3 +1037,245 @@ Rule: match model complexity to task complexity. Never use Opus where Sonnet wor
 | Wrap batch items in try/except | One failure must not stop the whole batch |
 | Return errors as tool results, don't raise | Agent decides how to handle, not your code |
 | Always log failures with the file/item name | You need to know what failed and why |
+
+---
+
+## Foundational Concepts — FDE Must Know
+
+### Model vs Harness
+
+**Model** — the AI itself. Takes tokens in, produces tokens out. No memory, no tools, no loop.
+
+```
+Input tokens → [MODEL] → Output tokens
+```
+
+Examples: `claude-sonnet-4-6`, `gpt-4o`, `llama-3.1-70b`
+
+**Harness** — the code around the model that makes it useful. It:
+- Sends messages to the model
+- Reads the response and decides what to do (call a tool? loop? return?)
+- Manages state, context, retries, logging
+
+```
+User input → [HARNESS] → Model API call → Response → [HARNESS] → Final answer
+                ↑                                           |
+                └───────────── tool result ←───────────────┘
+```
+
+The agent loop you memorize IS the harness:
+
+```python
+def run_agent(user_input):          # harness starts here
+    messages = [...]
+    for i in range(10):
+        response = client.messages.create(...)   # model call
+        if response.stop_reason == "end_turn":
+            return response.content[0].text      # harness decides: done
+        elif response.stop_reason == "tool_use":
+            result = execute_tool(...)           # harness runs tool
+            messages.append(...)                 # harness manages state
+```
+
+**Interview answer:** "The model is the brain — it reasons. The harness is the skeleton — it acts, remembers, and loops. You swap models, you keep the harness."
+
+---
+
+### Open Source Models vs Proprietary Models
+
+**Proprietary (company) models:**
+
+| Model | Company | Access |
+|---|---|---|
+| Claude Sonnet/Opus | Anthropic | API only |
+| GPT-4o | OpenAI | API only |
+| Gemini | Google | API only |
+
+- Never see the weights — just call the API
+- Company manages compute, updates, safety
+- Pay per token
+- Data goes to their servers
+
+**Open source models:**
+
+| Model | Origin | Weights |
+|---|---|---|
+| Llama 3.1 | Meta | Public download |
+| Mistral | Mistral AI | Public download |
+| Phi-3 | Microsoft | Public download |
+| Qwen | Alibaba | Public download |
+
+- Download the weights and run yourself
+- You manage the compute (GPU, server)
+- No per-token cost — but you pay for infrastructure
+- Data stays on your hardware
+
+**Which to pick — decision framework:**
+
+| Situation | Pick |
+|---|---|
+| Data can't leave customer VPC | Open source — run on their infra |
+| Regulated industry (healthcare, finance, govt) | Open source or private API deployment |
+| Need best reasoning quality | Proprietary (Claude Opus, GPT-4o) |
+| Budget constrained, high volume | Open source (no per-token cost at scale) |
+| Fast prototype, small team | Proprietary API (no infra to manage) |
+| Need fine-tuning on private data | Open source (you own the weights) |
+| Compliance requires audit of model weights | Open source |
+| Customer wants zero vendor lock-in | Open source |
+
+**Classic FDE scenario + answer:**
+> "The customer's data can't leave their VPC. How do you run our AI product?"
+> "Deploy an open source model — Llama 3 or Mistral — inside their VPC on their GPU infrastructure. Data never touches an external API. We lose some quality vs Claude Opus, but gain data residency compliance. We can fine-tune on their domain data to recover quality."
+
+---
+
+### Context Window
+
+The maximum number of tokens a model can see at once — both input and output combined.
+
+| Model | Context window |
+|---|---|
+| Claude Sonnet 4.6 | 200k tokens |
+| GPT-4o | 128k tokens |
+| Llama 3.1 70B | 128k tokens |
+
+**Why it matters for FDE:**
+- Long conversations eventually overflow — agent starts "forgetting" early turns
+- Large documents (PDFs, codebases) may not fit in a single call
+- Fix: summarize old turns, use RAG to retrieve only relevant chunks
+
+**Interview signal:** knowing the window size tells you when to trim context vs when you can pass everything.
+
+---
+
+### Temperature
+
+Controls randomness in model output. Range: 0.0 to 1.0 (or 2.0 on some models).
+
+| Temperature | Behavior | Use when |
+|---|---|---|
+| 0.0 | Deterministic — same input → same output | Classification, extraction, structured data |
+| 0.3–0.5 | Slight variation, still focused | Analysis, summarization |
+| 0.7–1.0 | Creative, varied | Brainstorming, copywriting |
+
+```python
+response = client.messages.create(
+    model="claude-sonnet-4-6",
+    temperature=0.0,   # deterministic — good for production agents
+    messages=messages
+)
+```
+
+**FDE rule:** Set `temperature=0` for production agents. Reproducibility and debuggability matter more than creativity.
+
+---
+
+### RAG vs Fine-Tuning
+
+Both add domain knowledge to a model — but they work completely differently.
+
+**RAG (Retrieval-Augmented Generation):**
+- At query time, search a vector database for relevant documents
+- Inject those chunks into the context window
+- Model answers using retrieved content
+
+```
+User question → search vector DB → retrieve top-k chunks → stuff into prompt → model answers
+```
+
+**Fine-tuning:**
+- Retrain the model weights on your domain data
+- Knowledge is baked into the model permanently
+- No retrieval at query time
+
+**Which to pick:**
+
+| Situation | Pick |
+|---|---|
+| Data changes frequently | RAG (update the DB, not the model) |
+| Need to cite sources | RAG (you know which chunks were used) |
+| Large corpus (10k+ docs) | RAG |
+| Need to change model behavior/style | Fine-tuning |
+| Domain has very specific jargon the base model doesn't know | Fine-tuning |
+| Fast to deploy, low cost | RAG |
+
+**FDE default:** Start with RAG. Fine-tune only after RAG fails to meet quality bar.
+
+**Interview answer:** "RAG is cheaper, faster to update, and lets you cite sources. Fine-tuning is better when you need to change how the model thinks, not just what it knows. I default to RAG and only fine-tune when RAG hits a ceiling."
+
+---
+
+### Embeddings
+
+A way to convert text into a list of numbers (a vector) that captures semantic meaning. Similar meaning → similar vectors.
+
+```
+"customer refund policy"  →  [0.23, -0.87, 0.44, ...]
+"how do I get my money back"  →  [0.21, -0.85, 0.41, ...]   ← close in vector space
+"quarterly earnings report"  →  [-0.91, 0.12, -0.33, ...]   ← far away
+```
+
+Used in RAG: embed your documents, embed the user query, find the closest chunks.
+
+```python
+# OpenAI embeddings
+response = client.embeddings.create(
+    model="text-embedding-3-small",
+    input="customer refund policy"
+)
+vector = response.data[0].embedding  # list of 1536 floats
+```
+
+**FDE use case:** Document Q&A over a customer's internal knowledge base. Embed all docs → store in vector DB (Pinecone, pgvector) → at query time retrieve top-k → answer with Claude.
+
+---
+
+### VPC / Private Endpoints
+
+**VPC (Virtual Private Cloud):** A private network inside AWS/Azure/GCP. Traffic stays inside — doesn't touch the public internet.
+
+**Why customers care:** Regulated industries (banking, healthcare, govt) require data to never leave their network.
+
+**FDE solution options:**
+
+| Option | How |
+|---|---|
+| Open source model in VPC | Run Llama/Mistral on customer's GPU — no external API calls |
+| AWS Bedrock / Azure OpenAI | Private endpoint inside VPC — data stays in their cloud account |
+| Anthropic Enterprise | Private deployment agreement |
+
+**Interview answer:** "If data can't leave their VPC, we have two paths: deploy an open source model on their infrastructure, or use a managed service like AWS Bedrock or Azure OpenAI that offers private endpoints within their existing cloud account."
+
+---
+
+### Tokens vs Words
+
+Tokens are not words — they're sub-word chunks the model actually processes.
+
+| Text | Tokens |
+|---|---|
+| "hello" | 1 |
+| "Forward Deployed Engineer" | 4 |
+| "ChatGPT" | 3 |
+| 1 page of text | ~500–750 tokens |
+| 1,000 words | ~1,300 tokens |
+
+**Rule of thumb:** 1 token ≈ 0.75 words. Or: 1,000 words ≈ 1,333 tokens.
+
+**Why it matters for FDE:**
+- Cost is per token, not per word — always estimate in tokens
+- Context window limits are in tokens — a 200k window ≈ ~150k words ≈ ~500 pages
+
+---
+
+### Inference vs Training
+
+**Training:** Building the model. Feeding billions of text examples to adjust billions of weights. Costs millions of dollars, takes weeks on thousands of GPUs. You never do this.
+
+**Inference:** Using the model. Send tokens in, get tokens out. This is every API call you make. This is what you pay for per token.
+
+**Fine-tuning** sits between the two — you train an existing model further on your data. Cheaper than training from scratch, but still requires GPU time and money.
+
+**FDE context:** You always work at inference time. When a customer asks "can we train it on our data?" — they usually mean fine-tuning. Clarify: do they want behavior change (fine-tune) or knowledge retrieval (RAG)?
+
+---
