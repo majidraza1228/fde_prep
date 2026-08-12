@@ -228,45 +228,31 @@ Transformers, attention mechanism, hallucination, RAG, fine-tuning, embeddings, 
 | `agent-loop-cheatsheet.md` | The complete `run_agent` function — write this from memory daily |
 | `prompt-caching.md` | Prompt caching deep dive — rules, cost math, best practices |
 | `microsoft-azure-github.md` | Azure OpenAI, Managed Identity, Content Safety, GitHub Actions |
+| `study-plan.md` | Full 3-week study plan — day by day, time-boxed, with daily habits and progress tracker |
 | `reference-material.md` | Official docs, links, and industry vertical index |
 
 ---
 
 ## Recommended Study Plan
 
-### Week 1 — Build foundations
-| Day | Activity |
-|---|---|
-| Mon | Read `fde-mock-interview-session.md` — FDE process + Areas 1–2 |
-| Tue | `/drill agent` until you score 10/10 |
-| Wed | Read Areas 3–4 (security, observability) → `/drill security` |
-| Thu | `/fde` — full mock question, get scored |
-| Fri | Read `asset-management-hedgefunds.md` → `/hedgefund` FDE mode |
+See [`study-plan.md`](study-plan.md) for the full day-by-day breakdown with time estimates, daily habits, and a progress tracker.
 
-### Week 2 — Add PM layer
-| Day | Activity |
-|---|---|
-| Mon | Read PM section of `fde-mock-interview-session.md` |
-| Tue | `/pm` — product sense question |
-| Wed | `/drill concepts` — transformers, RAG, hallucination |
-| Thu | `/concept MCP` then `/concept context engineering` |
-| Fri | `/hedgefund` PM mode |
+**Summary:**
 
-### Week 3 — Full mocks
-| Day | Activity |
-|---|---|
-| Mon | `/fde` full session — all areas mixed |
-| Tue | `/pm` full session — technical depth + product sense |
-| Wed | `/case` — cold customer scenario, no help |
-| Thu | `/hedgefund` — both FDE and PM mode back to back |
-| Fri | `/drill` — weakest decks only, then `/case` again |
+| Week | Theme | Key commands |
+|---|---|---|
+| Week 1 | FDE technical foundations | `/drill agent` `/drill cost` `/drill security` `/fde` |
+| Week 2 | PM layer on top | `/pm` `/concept` `/hedgefund` |
+| Week 3 | Cold mocks, gap closing | `/case` `/fde` `/pm` `/hedgefund` |
 
-### Daily habits (5 min every morning)
-Write these from memory before opening any notes:
-1. The full `run_agent` function with tool result format
+**Daily habit (5 min every morning — write from memory):**
+1. Full `run_agent` function with tool result format
 2. The 6 things to log on every API call
-3. One-liner for: RAG vs fine-tuning, prompt caching, model tiering
-4. The CISO prompt injection explanation in plain English
+3. One-liner: RAG vs fine-tuning
+4. One-liner: prompt caching savings
+5. Model tiering: Haiku → Sonnet → Opus
+6. CISO prompt injection explanation in plain English
+7. North star metric definition + one example
 
 ---
 
