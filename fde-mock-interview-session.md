@@ -1385,6 +1385,149 @@ Tokens are not words — they're sub-word chunks the model actually processes.
 
 ---
 
+## AI PM Technical Screen — Depth Filter (Nvidia, Glean, etc.)
+
+> Source: PM coach with 160 students — Nvidia and Glean both ran the same technical screen.
+> The test: "Can you go one level deeper than your last answer?"
+
+### The Rule: Answer Like a PM, Not a Researcher
+
+They don't want a PhD answer. They want:
+```
+Technical explanation (one level deep) → user/business impact → your product judgment
+```
+
+Never stop at the technical definition. Always land on: "and here's why that matters for the product."
+
+---
+
+### Company-Specific Technical Bar
+
+| Company Type | Technical Bar | What They Care About More |
+|---|---|---|
+| Nvidia, Glean, Anthropic, OpenAI | High — must go deep on every concept | Depth + practical experience building AI features |
+| Financial services, healthcare, enterprise | Medium | Implementation, legal, ethical angles |
+| Consumer tech (non-AI-native) | Lower | Product sense, metrics, user empathy |
+
+**Prepare for the specific interview you have next — not a generic AI PM interview.**
+
+---
+
+### How Transformers Work (PM answer)
+
+**One level deep:**
+Transformers process all tokens in a sequence simultaneously (not one at a time like older models). The key mechanism is **attention** — for each word, the model calculates how much to "pay attention" to every other word in the context. This is what lets it understand "bank" means "river bank" vs "financial bank" based on surrounding words.
+
+**Why it matters as a PM:**
+- Attention over long context = why models can read a 200-page document and still answer about page 3
+- All tokens processed in parallel = why inference is fast but memory-intensive (GPU cost)
+- Attention has quadratic cost with context length — doubling context length ~4x the compute cost
+
+**PM answer:**
+> "Transformers use an attention mechanism to weigh relationships between all tokens in the input simultaneously. That's why they're good at long-range dependencies — understanding a pronoun that refers to something 10 sentences earlier. For product decisions, this matters because context window size directly affects both capability and cost. A 200k token window is powerful but expensive — that tradeoff shapes what features we can offer at what price point."
+
+---
+
+### Why Models Hallucinate (PM answer)
+
+**One level deep:**
+Models don't "know" facts — they predict the most statistically likely next token given their training data. When asked about something outside their training distribution (niche facts, recent events, specific numbers), they generate a plausible-sounding answer rather than saying "I don't know." The model has no internal flag for "I'm uncertain."
+
+**Why it matters as a PM:**
+- Hallucination rate is a core product metric — track it per use case, not globally
+- High-stakes domains (legal, medical, finance) require mitigation: RAG, citations, human review
+- User trust is fragile — one confident wrong answer can kill adoption
+- Mitigation adds latency and cost — that's a product tradeoff to own
+
+**PM answer:**
+> "Hallucination happens because models are trained to produce fluent, probable text — not to verify facts. They have no internal uncertainty signal. As a PM, I treat hallucination rate as a product metric segmented by use case: a creative writing feature can tolerate more than a legal document tool. Mitigation strategies like RAG, grounding responses in retrieved source documents, and adding citations are features I'd prioritize early in high-stakes domains — even if they add latency."
+
+---
+
+### When to Choose LLM vs Traditional ML Model (PM answer)
+
+**The decision framework:**
+
+| Use LLM when | Use traditional ML when |
+|---|---|
+| Task requires language understanding or generation | Task is purely classification or regression |
+| Output needs to be flexible / open-ended | Output is a fixed label or number |
+| Context and nuance matter | Speed and cost are critical at scale |
+| Few labeled examples exist | You have large labeled datasets |
+| User asks questions in natural language | Input is structured (tabular, numeric) |
+
+**Examples:**
+
+| Task | Right choice | Why |
+|---|---|---|
+| Classify support ticket as urgent/not | Traditional ML (or Haiku) | Binary, fast, cheap |
+| Summarize a support ticket | LLM | Requires language generation |
+| Predict churn probability | Traditional ML | Tabular data, regression |
+| Explain why a user might churn | LLM | Requires reasoning over context |
+| Fraud detection on transactions | Traditional ML | Speed critical, structured data |
+| Draft fraud alert message to user | LLM | Natural language output |
+
+**PM answer:**
+> "LLMs are the right choice when the task involves language, nuance, or open-ended output — and when you don't have large labeled datasets. Traditional ML wins when you need speed, cost efficiency, and have structured data with known labels. In practice, I often see the two working together: a traditional ML model as a fast first-pass filter, feeding flagged cases to an LLM for deeper analysis or explanation. The product decision is really about latency tolerance and unit economics."
+
+---
+
+### Orchestration (PM answer)
+
+**One level deep:**
+Orchestration is the system that coordinates multiple LLM calls, tools, and agents to complete a multi-step task. It manages: which model runs when, what tools it can use, how results flow between steps, and what happens when something fails.
+
+**Examples:** LangChain, LlamaIndex, custom harness code, Anthropic's tool use loop.
+
+**PM answer:**
+> "Orchestration matters for product decisions because it determines reliability and cost. A poorly designed orchestration layer can cause agent loops, runaway API costs, or silent failures. As a PM, I'd want visibility into how many steps a task takes on average, where it fails most often, and what the cost per successful completion is. Those metrics tell me where to invest in reliability vs. where to cut scope."
+
+---
+
+### MCP — Model Context Protocol (PM answer)
+
+**One level deep:**
+MCP is Anthropic's open standard that lets AI models connect to external tools and data sources in a standardized way. Instead of every developer writing custom integration code, MCP provides a common interface — like USB-C for AI tool connections.
+
+**Why it matters as a PM:**
+- Reduces integration time for enterprise customers (big FDE/PM win)
+- Ecosystem play — more MCP-compatible tools = more value from Claude
+- Standardization lowers switching cost, which is both a risk and an opportunity
+
+**PM answer:**
+> "MCP is a standardization play. It lowers the cost of integrating AI into existing workflows because developers don't need custom connectors for every tool. For a PM, this is about ecosystem growth — the more MCP-compatible integrations exist, the stickier the platform becomes. It's similar to how App Store APIs accelerated iPhone adoption. The product risk is that standardization also lowers switching costs for customers to move to competitors."
+
+---
+
+### Context Engineering (PM answer)
+
+**One level deep:**
+Context engineering is the practice of deliberately designing what goes into the model's context window at runtime — what to include, summarize, retrieve, or drop. It's not about making prompts shorter; it's about maximizing signal and minimizing noise per token.
+
+**Key levers:** RAG (retrieve relevant docs), summarization (compress old turns), tool result trimming (cut irrelevant fields), cache control (mark static sections).
+
+**PM answer:**
+> "Context engineering is the highest-leverage optimization most teams overlook. The instinct is to shorten prompts, but the real gains come from cutting what's irrelevant — stale conversation history, bloated tool responses, unused examples. As a PM, I'd treat context efficiency as a feature: it directly reduces cost per task and improves quality by reducing noise. I'd want a dashboard showing average context size per session and a goal to reduce it without degrading task completion rate."
+
+---
+
+### Technical Screen Reference
+
+| Topic | One-liner for depth filter |
+|---|---|
+| Transformers | Attention mechanism weights relationships between all tokens simultaneously — context window size is a cost/capability tradeoff |
+| Hallucination | Models predict probable text, not verified facts — mitigation is RAG + citations + human review |
+| LLM vs ML | LLM for language/nuance/open-ended; traditional ML for speed/cost/structured data |
+| Orchestration | Coordinates multi-step agent tasks — reliability and cost visibility are the PM concerns |
+| MCP | Standardized tool connection protocol — ecosystem and switching cost play |
+| Fine-tuning | Changes model behavior, not facts — use after RAG hits quality ceiling |
+| RAG | Retrieves relevant docs at query time — updates without retraining, citations included |
+| Context engineering | Design what goes in the window — cut noise, reduce cost, improve quality |
+
+**YouTube resource:** [AI PM Technical Screen Prep](https://www.youtube.com/watch?v=iBKrijO1PBQ)
+
+---
+
 ## PM-Specific Prep — Frameworks & Answer Structures
 
 ### Product Sense Answer Structure
