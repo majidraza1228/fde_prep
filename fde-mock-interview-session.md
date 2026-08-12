@@ -1353,6 +1353,134 @@ Tokens are not words — they're sub-word chunks the model actually processes.
 
 ---
 
+### Graph Engineering (Agent Graphs)
+
+**One-liner (memorize this):**
+> "Graph engineering is about modeling execution — which agent runs next and what state it gets — not about modeling data."
+
+**One level deeper:**
+Graph engineering wires multiple specialized agents or steps into a directed graph. Nodes do the work (LLM calls, tool calls, logic). Edges route between them (conditional or fixed). Shared state flows along the edges so every node sees the same context. Unlike a simple linear pipeline, graphs can branch, loop, and merge — giving you conditional logic without messy if/else chains.
+
+```
+              ┌──────────┐
+              │ classify │ ← node (LLM call)
+              └────┬─────┘
+         ┌─────────┴──────────┐
+         ▼                    ▼
+   ┌──────────┐         ┌──────────┐
+   │ research │         │  reject  │  ← conditional edges
+   └────┬─────┘         └──────────┘
+        ▼
+   ┌──────────┐
+   │ generate │
+   └──────────┘
+```
+
+**Main framework:** LangGraph (built on LangChain). Each node is a Python function. State is a typed dict passed between nodes.
+
+```python
+from langgraph.graph import StateGraph
+from typing import TypedDict
+
+class State(TypedDict):
+    query: str
+    research: str
+    answer: str
+
+def classify(state: State) -> State:
+    # LLM decides: research needed or not?
+    return {"research": "needed"}
+
+def research(state: State) -> State:
+    # RAG or tool call
+    return {"research": "...facts..."}
+
+def generate(state: State) -> State:
+    # Final answer using research
+    return {"answer": "..."}
+
+graph = StateGraph(State)
+graph.add_node("classify", classify)
+graph.add_node("research", research)
+graph.add_node("generate", generate)
+graph.add_edge("classify", "research")
+graph.add_edge("research", "generate")
+```
+
+**Why it matters — FDE angle:**
+Multi-step workflows (research → analyze → draft → review) map naturally to graphs. Customer workflows are rarely linear — graph engineering lets you model the actual flow without hardcoding it. Easier to debug (each node is isolated), easier to swap (replace one node without touching others).
+
+**Why it matters — PM angle:**
+Graph engineering is the architecture behind any multi-step AI product. As a PM, knowing this lets you scope features accurately — "add a review step" means adding a node and an edge, not rewriting the pipeline. It also shapes your reliability metrics: which node fails most often? which edge is the bottleneck?
+
+**Interview answer (say this out loud):**
+> "Graph engineering is how you structure multi-step agent workflows. Instead of a linear chain of LLM calls, you model the execution as a graph — nodes do the work, edges route between them based on conditions, and state flows through the whole thing. The practical benefit is you can branch, loop, and merge without messy imperative code. LangGraph is the main framework for this. As an FDE, this is how I'd architect any workflow that has conditional steps — classify first, then branch to different handlers based on the output."
+
+**Follow-up the interviewer will ask:**
+> "How is graph engineering different from just chaining LLM calls?"
+
+> "A chain is linear and static — every input goes through every step in order. A graph is dynamic — edges can be conditional, nodes can loop back, and parallel branches can merge. A chain breaks down when you need 'if research is needed, do X, otherwise do Y.' A graph handles that natively."
+
+---
+
+### GraphRAG (Knowledge Graphs + Retrieval)
+
+**One-liner (memorize this):**
+> "GraphRAG gives the LLM connected evidence — entity relationships — instead of a loose pile of similar text chunks."
+
+**One level deeper:**
+Standard RAG retrieves the most semantically similar text chunks. GraphRAG first extracts entities and their relationships from your documents into a knowledge graph (e.g., "Bridgewater → manages → $150B AUM → founded by → Ray Dalio"). At query time it retrieves both similar chunks AND traverses the graph to pull connected entities — enabling multi-hop reasoning like "what funds does the person who founded Bridgewater also manage?"
+
+**Two retrieval paths in GraphRAG:**
+```
+User query
+    │
+    ├── Vector search → similar text chunks (semantic)
+    │
+    └── Graph traversal → connected entity relationships (structural)
+            │
+            └── merged → LLM context window → answer
+```
+
+**Indexing pipeline:**
+```
+Raw documents
+    → LLM extracts entities + relationships
+    → Entity resolution (deduplicate "Ray Dalio" / "R. Dalio")
+    → Graph construction (Neo4j, Amazon Neptune, or in-memory)
+    → Vector embeddings on nodes
+```
+
+**When to use GraphRAG vs standard RAG:**
+
+| Use standard RAG | Use GraphRAG |
+|---|---|
+| Single-document Q&A | Multi-document reasoning |
+| Semantic similarity is enough | Entity relationships matter |
+| Speed and simplicity | Higher accuracy on complex queries |
+| No structured entity data | Rich entity data exists (finance, legal, medical) |
+
+**Why it matters — FDE angle:**
+At a hedge fund or law firm, "who are the counterparties of this deal and what other deals are they in?" is a graph query, not a vector search. GraphRAG is the answer. Harder to deploy (requires graph DB, entity extraction pipeline) but dramatically better on relationship-heavy queries.
+
+**Why it matters — PM angle:**
+GraphRAG is a quality feature, not a cost feature. You'd prioritize it when standard RAG fails on multi-hop questions — "what other investments does this fund manager have exposure to?" that requires connecting three documents. The tradeoff: higher infra cost, longer indexing time, more complex pipeline.
+
+**Interview answer (say this out loud):**
+> "GraphRAG combines knowledge graphs with retrieval. Standard RAG retrieves semantically similar chunks — it's good for single-document questions but breaks down when the answer requires connecting information across multiple documents or entities. GraphRAG first extracts entities and relationships into a graph, then at query time retrieves both similar chunks and traverses the graph for connected entities. Classic use case: a hedge fund analyst asking 'what other positions does this fund manager have exposure to?' — that needs graph traversal, not just vector similarity."
+
+**Follow-up the interviewer will ask:**
+> "When would you NOT use GraphRAG?"
+
+> "When speed and simplicity matter more than multi-hop accuracy. GraphRAG requires an entity extraction pipeline, a graph database, and longer indexing time. For a simple document Q&A chatbot, standard RAG is cheaper and faster. I'd introduce GraphRAG only when standard RAG demonstrably fails on the queries that matter most to the user."
+
+**Reference resources:**
+- [GraphRAG Guide 2026 — MyEngineeringPath](https://myengineeringpath.dev/genai-engineer/graph-rag/)
+- [Graph Engineering for AI Agents — Analytics Vidhya](https://www.analyticsvidhya.com/blog/2026/07/graph-engineering/)
+- [Graph Engineering Guide 2026 — AI Builder Club](https://www.aibuilderclub.com/blog/graph-engineering-guide-2026)
+
+---
+
 ### RAG vs Fine-Tuning — Reference Resources
 
 **The one line to remember (2026 production consensus):**

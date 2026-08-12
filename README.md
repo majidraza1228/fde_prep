@@ -229,6 +229,7 @@ Transformers, attention mechanism, hallucination, RAG, fine-tuning, embeddings, 
 | `prompt-caching.md` | Prompt caching deep dive — rules, cost math, best practices |
 | `microsoft-azure-github.md` | Azure OpenAI, Managed Identity, Content Safety, GitHub Actions |
 | `study-plan.md` | Full 3-week study plan — day by day, time-boxed, with daily habits and progress tracker |
+| `how-to-add-concepts.md` | Process for adding new concepts, verticals, and slash commands to the system |
 | `reference-material.md` | Official docs, links, and industry vertical index |
 
 ---
@@ -256,13 +257,17 @@ See [`study-plan.md`](study-plan.md) for the full day-by-day breakdown with time
 
 ---
 
-## How to Add a New Vertical
+## How to Add a New Concept or Vertical
 
-To add a new industry vertical (legal, healthcare, insurance, etc.):
+See [`how-to-add-concepts.md`](how-to-add-concepts.md) for the full step-by-step process.
 
-1. Create `<vertical>.md` with: use cases, constraints, customer objections, FDE scenarios, PM questions, architecture pattern
-2. Create `.claude/commands/<vertical>.md` following the `/hedgefund` command format
-3. Add the vertical to the index in `reference-material.md`
+**Quick version for a new concept:**
+```
+/concept [concept name]
+```
+Claude explains it at interview depth and offers to save it to the study file automatically.
+
+**Quick version for a new vertical:** Copy `asset-management-hedgefunds.md` and `.claude/commands/hedgefund.md`, update for the new industry, add to `reference-material.md` and `README.md`.
 
 ---
 
@@ -279,6 +284,8 @@ To add a new industry vertical (legal, healthcare, insurance, etc.):
 - [x] Foundational Concepts (Model vs Harness, RAG, Fine-tuning, Embeddings, VPC, Tokens, etc.)
 - [x] AI PM Technical Screen (Transformers, Hallucination, LLM vs ML, Orchestration, MCP)
 - [x] Industry Vertical: Asset Management & Hedge Funds
+- [x] Graph Engineering (agent graphs, LangGraph, nodes/edges/state)
+- [x] GraphRAG (knowledge graphs + retrieval, multi-hop reasoning)
 - [ ] Kubernetes + AWS for AI Workloads
 - [ ] Industry Vertical: Legal / Law Firms
 - [ ] Industry Vertical: Healthcare

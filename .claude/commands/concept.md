@@ -45,9 +45,12 @@ Transformers, attention mechanism, hallucination, RAG, fine-tuning, embeddings, 
 context window, context engineering, temperature, tokens, inference vs training, orchestration,
 MCP, prompt caching, model tiering, batch API, VPC, private endpoints, prompt injection,
 tool use, agentic systems, evals, RLHF, system prompt, few-shot prompting, structured outputs,
-north star metric, RICE, LLM vs ML model, open source vs proprietary models
+north star metric, RICE, LLM vs ML model, open source vs proprietary models,
+graph engineering, GraphRAG, knowledge graph, LangGraph, agent loop, agent state
 
 If the user asks about something not on this list, explain it using the same format anyway.
+After explaining a new concept not already in `fde-mock-interview-session.md`, save it there
+under the Foundational Concepts section using the standard format.
 
 ## Rules
 - Never go engineer-deep without adding PM/FDE so what
