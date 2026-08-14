@@ -4,15 +4,30 @@ Structured preparation for **Forward Deployed Engineer (FDE)** and **Product Man
 
 Built to be used with **Claude Code** (`claude` CLI). The slash commands turn Claude into a live interviewer, flashcard coach, and case study partner — all grounded in the study material in this repo.
 
+**To share this with someone else:** send them this repo URL and point them to the Quick Start below. All they need is Node.js, an Anthropic API key, and 3 commands (`npm install`, `git clone`, `claude`). The slash commands work immediately with no additional setup.
+
 ---
 
 ## Quick Start (New User)
+
+### Prerequisites
+
+- **Node.js 18+** — check with `node --version`
+- **Anthropic API key** — get one at [console.anthropic.com](https://console.anthropic.com)
 
 ### 1. Install Claude Code
 
 ```bash
 npm install -g @anthropic-ai/claude-code
 ```
+
+Then set your API key (one-time):
+
+```bash
+export ANTHROPIC_API_KEY=sk-ant-...
+```
+
+To make it permanent, add that line to your `~/.zshrc` or `~/.bashrc` and run `source ~/.zshrc`.
 
 ### 2. Clone this repo and open it
 
@@ -24,7 +39,7 @@ claude
 
 ### 3. Start practicing immediately
 
-Type any slash command in the Claude Code prompt:
+Type any slash command at the Claude Code prompt:
 
 ```
 /fde
@@ -32,10 +47,15 @@ Type any slash command in the Claude Code prompt:
 /drill
 /case
 /hedgefund
+/assetmanagement
 /concept RAG
 ```
 
 That's it. Claude reads the study files in this repo and runs a live mock interview.
+
+### How it works
+
+When you run `claude` inside this folder, Claude Code automatically loads all files in `.claude/commands/` as slash commands. The commands tell Claude which role to play (interviewer, flashcard coach, skeptical customer) and which study files to draw from. You don't need to configure anything — it works as soon as you clone the repo and open it.
 
 ---
 
@@ -189,6 +209,44 @@ Claude asks FDE or PM, then runs the scenario.
 
 ---
 
+### `/assetmanagement` — Traditional Asset Management Mock
+
+Full mock interview set inside the traditional asset management vertical — BlackRock, Vanguard, Fidelity, State Street, PIMCO, pension funds, endowments, and sovereign wealth funds. Covers both FDE and PM angles.
+
+**Key distinction from `/hedgefund`:** Traditional AM is about managing trillions across millions of accounts at scale — not alpha generation. Compliance scrutiny on client communications is higher (FINRA supervision), procurement cycles are longer, and the core platform (Aladdin, Charles River) controls access to everything.
+
+**FDE mode** — Claude plays three customer characters simultaneously:
+- **Head of Distribution / CRO** — cares about advisor productivity and AUM retention, hates added friction
+- **Chief Compliance Officer** — owns SEC/FINRA/DOL exposure, must supervise all client communications
+- **Head of Technology / CTO** — controls Aladdin integration, long vendor security review cycles
+
+**FDE scenarios:**
+1. Wealth management at scale — AI-drafted advisor communications with compliance supervision
+2. Fund research Q&A — natural language over 3,000+ proprietary reports, nothing leaves the network
+3. Institutional client reporting — 600 pension funds, 6-week manual cycle, legal liability question
+4. ESG regulatory audit — 230 funds, 8-week SEC filing deadline
+5. Advisor onboarding copilot — confident wrong answers are the risk
+6. Aladdin integration blocker — board demo in 3 weeks, IT says 10 more weeks
+
+**PM mode — questions include:**
+- Design an AI copilot for a financial advisor — what's your north star (not "time saved")?
+- How does an AI company build something valuable without being blocked by Aladdin?
+- Should we white-label our AI product under a large AM firm's brand?
+- A CCO asks: how do we prove FINRA that a human reviewed every AI-drafted communication?
+
+**Scoring always checks:**
+1. Did you address the FINRA supervision requirement (not just data privacy)?
+2. Did you propose a human approval workflow with an audit trail?
+3. Did you acknowledge the platform integration constraint (Aladdin/Charles River)?
+
+**Usage:**
+```
+/assetmanagement
+```
+Claude asks FDE or PM, then runs the scenario.
+
+---
+
 ### `/concept` — Explain Any AI Concept at Interview Depth
 
 Name any AI concept. Claude explains it at PM/FDE interview depth — not a textbook definition, not a research paper. Always ends with a ready-to-say interview answer and the follow-up question the interviewer will ask.
@@ -243,8 +301,8 @@ See [`study-plan.md`](study-plan.md) for the full day-by-day breakdown with time
 | Week | Theme | Key commands |
 |---|---|---|
 | Week 1 | FDE technical foundations | `/drill agent` `/drill cost` `/drill security` `/fde` |
-| Week 2 | PM layer on top | `/pm` `/concept` `/hedgefund` |
-| Week 3 | Cold mocks, gap closing | `/case` `/fde` `/pm` `/hedgefund` |
+| Week 2 | PM layer on top | `/pm` `/concept` `/hedgefund` `/assetmanagement` |
+| Week 3 | Cold mocks, gap closing | `/case` `/fde` `/pm` `/hedgefund` `/assetmanagement` |
 
 **Daily habit (5 min every morning — write from memory):**
 1. Full `run_agent` function with tool result format
@@ -267,7 +325,18 @@ See [`how-to-add-concepts.md`](how-to-add-concepts.md) for the full step-by-step
 ```
 Claude explains it at interview depth and offers to save it to the study file automatically.
 
-**Quick version for a new vertical:** Copy `asset-management-hedgefunds.md` and `.claude/commands/hedgefund.md`, update for the new industry, add to `reference-material.md` and `README.md`.
+**Quick version for a new vertical** (e.g. Legal, Healthcare):
+
+1. Create a study file: `legal-lawfirms.md` — industry context, use cases, compliance constraints, objections
+2. Create a command file: `.claude/commands/legal.md` — interviewer persona, scenarios, scoring rubric
+3. Add a row to the Study Files table and a section to Slash Commands in this README
+4. Add a `- [x]` entry to Areas Covered
+
+Use `asset-management-hedgefunds.md` + `.claude/commands/assetmanagement.md` as a template — they're the most complete example of the pattern.
+
+**Adding a new slash command in general:**
+
+Any `.md` file you drop into `.claude/commands/` becomes a `/commandname` slash command automatically the next time you run `claude` in this repo. No registration or config needed.
 
 ---
 
@@ -283,7 +352,8 @@ Claude explains it at interview depth and offers to save it to the study file au
 - [x] Prompt Caching — Deep Dive
 - [x] Foundational Concepts (Model vs Harness, RAG, Fine-tuning, Embeddings, VPC, Tokens, etc.)
 - [x] AI PM Technical Screen (Transformers, Hallucination, LLM vs ML, Orchestration, MCP)
-- [x] Industry Vertical: Asset Management & Hedge Funds
+- [x] Industry Vertical: Hedge Funds (`/hedgefund`)
+- [x] Industry Vertical: Traditional Asset Management (`/assetmanagement`)
 - [x] Graph Engineering (agent graphs, LangGraph, nodes/edges/state)
 - [x] GraphRAG (knowledge graphs + retrieval, multi-hop reasoning)
 - [ ] Kubernetes + AWS for AI Workloads
