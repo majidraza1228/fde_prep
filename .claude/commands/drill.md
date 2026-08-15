@@ -17,6 +17,7 @@ Run a rapid-fire drill session. One question at a time. Do NOT give the answer u
 - `frameworks` — RICE, product sense structure, conflicting metrics answer
 - `safety` — when not to ship, ethics answer frame
 - `pmtech` — the 5-concept technical fluency deck: LLMs, tools, skills, orchestration, routing (Nvidia/Glean depth filter)
+- `dataeng` — data engineering concepts for AI roles: ETL vs ELT, feature stores, batch vs streaming, data lineage, dbt, Kafka, DAGs, data quality
 
 ## Step 2 — Drill loop
 
@@ -88,3 +89,42 @@ Draw from this list when the user selects `pmtech`. Mix concepts across the 5 ar
 - If the user says "I don't know", give the answer and mark it Wrong
 - Prioritize questions the user got wrong earlier in the session
 - For pmtech: always end the session by pointing to the "PM Technical Fluency — Deep Dive Practice Questions" section in `fde-mock-interview-session.md` for any gaps
+- For dataeng: always end the session by pointing to the "Data Engineering Concepts" section in `fde-mock-interview-session.md` for any gaps
+
+## dataeng deck — question bank
+
+Draw from this list when the user selects `dataeng`. Mix concepts across areas.
+
+**Core concepts:**
+- "What is the difference between ETL and ELT — and which one wins in the modern data stack?"
+- "What is dbt and what problem does it solve for data teams?"
+- "What is a DAG in a data engineering context?"
+- "What is data lineage and why do data engineers care about it so much?"
+- "What is a feature store and why does it exist?"
+- "What is data quality — how do you define and measure it?"
+- "What is a data catalog and why do large teams need one?"
+
+**Batch vs streaming:**
+- "What's the difference between batch processing and streaming?"
+- "When would you use Kafka over a batch pipeline?"
+- "Give me an example where streaming is required and batch would fail."
+
+**Storage and infrastructure:**
+- "What's the difference between a data warehouse and a data lakehouse?"
+- "What is a vector database and how is it different from a relational database?"
+- "When would you use Snowflake vs Databricks?"
+
+**AI in data engineering:**
+- "Where does AI fit into a modern data pipeline — what jobs can it do, and what can't it do reliably?"
+- "Why is hallucination more dangerous in a data engineering context than in a chatbot?"
+- "What is natural language to SQL, and what's the main risk?"
+- "How do you maintain data lineage when AI is generating transformations?"
+
+**One-liners (fire 5 in a row as warm-up):**
+- "ETL vs ELT?" → ETL transforms before loading (legacy); ELT loads raw first, transforms in the warehouse (modern/dbt)
+- "What is dbt?" → SQL transformation layer with version control and built-in lineage — turns raw warehouse data into clean, documented tables
+- "What is a DAG?" → Directed Acyclic Graph — a pipeline where each task flows in one direction with no cycles
+- "Batch vs streaming?" → Batch processes data at intervals; streaming processes events as they arrive
+- "What is a feature store?" → Centralized repo of ML features with consistent definitions and freshness — prevents the same feature being computed 5 different ways
+- "What is data lineage?" → The ability to trace every number back to its source — which table, which transform, which upstream system produced it
+- "Vector DB vs relational DB?" → Vector DB stores high-dimensional embeddings for semantic similarity search; relational DB stores structured data for exact queries
