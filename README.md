@@ -4,6 +4,8 @@ Structured preparation for **Forward Deployed Engineer (FDE)** and **Product Man
 
 Built to be used with **Claude Code** (`claude` CLI). The slash commands turn Claude into a live interviewer, flashcard coach, and case study partner — all grounded in the study material in this repo.
 
+**Primary command:** `/fde-session` — teaches a concept, quizzes you cold, scores your answer, and auto-updates your Notion tracker. Start here.
+
 **To share this with someone else:** send them this repo URL and point them to the Quick Start below. All they need is Node.js, an Anthropic API key, and 3 commands (`npm install`, `git clone`, `claude`). The slash commands work immediately with no additional setup.
 
 ---
@@ -42,12 +44,16 @@ claude
 Type any slash command at the Claude Code prompt:
 
 ```
+/fde-session RAG          ← start here: teach + practice + Notion update
+/fde-session fde          ← FDE mock interview
+/fde-session dataeng      ← data engineering mock interview
 /fde
 /pm
 /drill
 /case
 /hedgefund
 /assetmanagement
+/dataengineering
 /concept RAG
 ```
 
@@ -247,6 +253,75 @@ Claude asks FDE or PM, then runs the scenario.
 
 ---
 
+### `/fde-session` — Full Study Session with Notion Tracking (Recommended)
+
+The primary command for structured prep. One command handles the complete loop: **teach → practice → score → auto-update Notion** — no manual tracking needed.
+
+Supports three modes detected from the argument:
+
+| Invocation | Mode | What it does |
+|---|---|---|
+| `/fde-session RAG` | Concept study | Teaches concept → cold practice question → scores → updates Notion |
+| `/fde-session fde` | FDE mock interview | Random area question → scores → logs session to Notion |
+| `/fde-session dataeng` | Data engineering mock | FDE/PM/Drill sub-modes → scores → logs session to Notion |
+| `/fde-session` | No argument | Asks which mode you want |
+
+**Notion auto-updates after every session:**
+- **FDE Preparation database** — creates/updates a row with Status (Completed / In progress), Area, and your score + gap in Notes
+- **Top 10 Concepts tracker** — marks concept done, fills in the full breakdown, logs your score
+
+**Usage:**
+```
+/fde-session RAG
+/fde-session fine-tuning vs RAG
+/fde-session fde
+/fde-session dataeng
+```
+
+---
+
+### `/dataengineering` — Data Engineering Mock Interview
+
+Standalone data engineering mock for FDE and PM roles at AI companies selling into data teams — Databricks, Snowflake, dbt Labs, Confluent, Fivetran, Astronomer, and enterprise data platform teams.
+
+**Key context baked in:** Data engineers are skeptical of AI hype. They care about reliability, data quality, and not breaking pipelines finance depends on. Claude pushes back accordingly.
+
+**Three sub-modes:**
+
+**FDE — On-Site Scenarios (Claude plays all characters)**
+Characters: Lead Data Engineer (reliability-first), Analytics Engineer (lineage-focused), CDO (ROI-focused)
+
+Scenarios include:
+1. Pipeline monitoring — AI reads Airflow failure logs, but PII can't leave VPC
+2. Natural language to SQL — a prior vendor hallucinated a JOIN that corrupted revenue; the CFO saw it
+3. Data quality anomaly detection — semantic issues dbt tests can't catch
+4. Schema migration assistant — 500 tables, 200 dbt models, mostly undocumented
+5. AI-powered data catalog — 2,000 tables, no column-level docs
+6. Real-time feature store — 12 data science teams computing the same features 5 different ways
+
+**PM — Product and Strategy Questions**
+- Design an AI copilot for data engineers (north star: NOT "queries answered")
+- Should we build NL-to-SQL or embed into dbt/Snowflake?
+- Snowflake just launched Cortex AI — does that kill our product?
+- An AI-generated SQL query corrupted revenue numbers. The CFO saw it. How do you respond as PM?
+
+**Drill — Rapid-Fire DE Concepts**
+ETL vs ELT, feature stores, batch vs streaming, data lineage, dbt, DAGs, data catalogs, vector databases, AI in data pipelines — one at a time, keep score, surface gaps.
+
+**Scoring always checks:**
+- Did they address data residency / VPC constraint?
+- Did they propose explainability — can the AI show its work?
+- Did they acknowledge what AI can't reliably do?
+- Did they handle the "we've been burned before" objection?
+
+**Usage:**
+```
+/dataengineering
+```
+Claude asks FDE, PM, or Drill — then runs the session.
+
+---
+
 ### `/concept` — Explain Any AI Concept at Interview Depth
 
 Name any AI concept. Claude explains it at PM/FDE interview depth — not a textbook definition, not a research paper. Always ends with a ready-to-say interview answer and the follow-up question the interviewer will ask.
@@ -276,6 +351,59 @@ Transformers, attention mechanism, hallucination, RAG, fine-tuning, embeddings, 
 
 ---
 
+## What This Agent Does — and How to Use It Effectively
+
+### The system in one sentence
+This is a Claude Code–powered interview coach that teaches concepts, runs cold mock interviews, scores your answers without softening, and automatically tracks your progress in Notion — all from slash commands in your terminal.
+
+### What the agent actually does
+
+**When you run `/fde-session <concept>`:**
+1. Explains the concept at FDE/PM interview depth (one-liner → how it works → FDE angle → PM angle → interview answer to memorize → likely follow-up)
+2. Asks if you want to practice cold — if yes, asks the question and waits for your answer
+3. Scores you honestly (Pass / Borderline / No hire) with specific gaps named
+4. Without asking: updates your Notion FDE Preparation database and Top 10 Concepts tracker — marking status, logging score, filling in the concept section
+
+**When you run `/fde-session fde`:**
+1. Picks a random FDE interview area (system design, customer scenario, cost optimization, security, observability, platform-specific)
+2. Asks one realistic question and waits
+3. Scores your answer — pushes back if you're vague
+4. Logs the session to Notion automatically
+
+**When you run `/fde-session dataeng`:**
+1. Asks which sub-mode: FDE on-site scenario, PM product/strategy, or Drill rapid-fire
+2. FDE mode: plays three customer characters (Lead DE, Analytics Engineer, CDO) through a realistic data platform scenario — stays in character until you give a clear recommendation
+3. PM mode: asks product sense, strategy, or technical depth questions specific to data engineering buyers
+4. Drill mode: rapid-fire DE concept questions, keeps score, surfaces gaps
+5. Logs everything to Notion
+
+### How to use it effectively
+
+**Start every study session with one `/fde-session <concept>`** — not a passive read. The cold practice question is the point. Reading without answering out loud does not prepare you for interviews.
+
+**Use the score seriously.** Borderline is not a pass. If you get Borderline, the agent will ask if you want to try again — say yes. Most improvement happens in the second attempt.
+
+**Rotate between all three modes across the week:**
+- Concept sessions build vocabulary and interview-ready answers
+- FDE mock interviews build the muscle of structuring a response under pressure
+- Data engineering mock builds the vertical-specific fluency that separates candidates
+
+**The Notion tracker is your progress surface.** After a few sessions you'll have a real record of what you've covered, your scores, and your gaps. Use it to decide what to drill next — don't just repeat concepts you already passed.
+
+**The `/drill` command is for warm-up, not depth.** Run it for 10 minutes before a concept session or mock. It primes your memory without the cognitive load of a full session.
+
+**For data engineering specifically:** Go into FDE mode at least twice before any interview at Databricks, Snowflake, dbt Labs, or similar. The customer pushback scenarios (hallucinated JOINs, VPC constraints, "we've been burned before") are realistic and the scoring rubric matches what those buyers actually care about.
+
+### Notion integration
+
+The agent connects to two Notion pages:
+- **FDE Preparation database** — one row per concept or mock session, with Status, Area, and score in Notes
+- **Top 10 Concepts tracker** — structured study order with status per concept and full breakdowns as you complete them
+
+Both update automatically at the end of every `/fde-session` run. You never need to manually update Notion.
+
+---
+
 ## Study Files
 
 | File | What's in it |
@@ -300,9 +428,9 @@ See [`study-plan.md`](study-plan.md) for the full day-by-day breakdown with time
 
 | Week | Theme | Key commands |
 |---|---|---|
-| Week 1 | FDE technical foundations | `/drill agent` `/drill cost` `/drill security` `/fde` |
-| Week 2 | PM layer on top | `/pm` `/concept` `/hedgefund` `/assetmanagement` |
-| Week 3 | Cold mocks, gap closing | `/case` `/fde` `/pm` `/hedgefund` `/assetmanagement` |
+| Week 1 | FDE technical foundations | `/fde-session <concept>` `/drill agent` `/drill cost` `/drill security` `/fde` |
+| Week 2 | PM layer + data engineering | `/fde-session dataeng` `/pm` `/concept` `/hedgefund` `/assetmanagement` |
+| Week 3 | Cold mocks, gap closing | `/fde-session fde` `/case` `/fde` `/pm` `/hedgefund` `/assetmanagement` |
 
 **Daily habit (5 min every morning — write from memory):**
 1. Full `run_agent` function with tool result format
@@ -354,8 +482,10 @@ Any `.md` file you drop into `.claude/commands/` becomes a `/commandname` slash 
 - [x] AI PM Technical Screen (Transformers, Hallucination, LLM vs ML, Orchestration, MCP)
 - [x] Industry Vertical: Hedge Funds (`/hedgefund`)
 - [x] Industry Vertical: Traditional Asset Management (`/assetmanagement`)
+- [x] Industry Vertical: Data Engineering / Data Platform (`/dataengineering`)
 - [x] Graph Engineering (agent graphs, LangGraph, nodes/edges/state)
 - [x] GraphRAG (knowledge graphs + retrieval, multi-hop reasoning)
+- [x] Top 10 AI Concepts structured study track with Notion tracking (`/fde-session`)
 - [ ] Kubernetes + AWS for AI Workloads
 - [ ] Industry Vertical: Legal / Law Firms
 - [ ] Industry Vertical: Healthcare
