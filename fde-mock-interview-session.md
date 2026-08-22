@@ -1513,6 +1513,37 @@ GraphRAG is a quality feature, not a cost feature. You'd prioritize it when stan
 
 ---
 
+### Evals (LLM Evaluation)
+
+**One-liner (memorize this):**
+Evals are automated tests for LLM behavior — the CI/CD of AI systems, measuring output quality, accuracy, and safety before and after every model or prompt change.
+
+**One level deeper:**
+An eval is a dataset of input/output pairs run against your LLM pipeline, with a judge (another LLM, a heuristic, or human labels) scoring each output. You define what "correct" looks like — exact match, semantic similarity, rubric-based scoring, or tool call accuracy. Evals run on every change so you catch regressions in quality the same way unit tests catch regressions in code.
+
+**Why it matters (FDE angle):**
+When you deploy an AI feature to a customer, the first question they'll ask after week 1 is "is this getting better or worse?" Without evals, you can't answer that. On-site, you'll be asked how to measure output quality, how to know if a prompt change helped, or how to validate a fine-tuned model. Evals are the honest answer.
+
+**Why it matters (PM angle):**
+You can't ship model improvements without evals — you're flying blind. Evals define your quality bar, let you move fast without breaking trust, and give you the data to prioritize model vs. RAG vs. prompt changes. They're also how you surface user trust problems before they become churn.
+
+**Interview answer (say this out loud):**
+"Evals are automated quality tests for LLM outputs — think of them as unit tests, but for AI behavior. You build a golden dataset of input/output pairs and a judge — either another LLM, a regex heuristic, or a rubric — that scores each output. You run evals before and after every prompt change, model update, or RAG retrieval change. They're how you know if a change made things better or just different. At an FDE level, I'd instrument them from day one on a deployment so the customer has a quality baseline they can track over time."
+
+**Follow-up the interviewer will ask:**
+"How would you actually build one from scratch?"
+
+**Answer:**
+1. **Collect a golden dataset** — 50-200 real user inputs, labeled with what a correct response looks like (exact text, rubric, or tool calls)
+2. **Choose a judge** — LLM-as-judge (Claude scoring 1-5 on a rubric) for open-ended output; exact match or regex for structured outputs; human review for high-stakes
+3. **Define metrics** — accuracy (is the answer right?), faithfulness (does it cite the source?), relevance (does it answer the question?), refusal rate, latency
+4. **Run automatically** — wire it into CI or a cron job; compare scores across versions with a diff view
+5. **Triage failures** — cluster low-scoring outputs by failure mode (hallucination, wrong tool call, irrelevant retrieval) to inform what to fix next
+
+**The trap:** evaluating on your training distribution. You need adversarial examples and edge cases, not just the easy ones.
+
+---
+
 ## AI PM Technical Screen — Depth Filter (Nvidia, Glean, etc.)
 
 > Source: PM coach with 160 students — Nvidia and Glean both ran the same technical screen.
@@ -1609,6 +1640,44 @@ Orchestration is the system that coordinates multiple LLM calls, tools, and agen
 
 **PM answer:**
 > "Orchestration matters for product decisions because it determines reliability and cost. A poorly designed orchestration layer can cause agent loops, runaway API costs, or silent failures. As a PM, I'd want visibility into how many steps a task takes on average, where it fails most often, and what the cost per successful completion is. Those metrics tell me where to invest in reliability vs. where to cut scope."
+
+---
+
+### Prompts vs Skills vs Tools vs MCP — The FDE Stack
+
+**One-liner (memorize this):**
+Prompts instruct the model, tools give it agency to act, MCP standardizes how it connects to external systems, and skills package proven workflows for reuse across deployments.
+
+**Decision framework:**
+- Customer asks "can the AI know our policies?" → **Prompt** (inject or RAG)
+- Customer asks "can the AI look up live data?" → **Tool** (function calling)
+- Customer asks "can it connect to Slack + Jira + Confluence?" → **MCP** (connect servers, no custom code)
+- Customer asks "can we reuse this for 10 teams?" → **Skill** (package prompt+logic with config overrides)
+
+**Why it matters (FDE angle):**
+On every engagement you'll get "can the AI just… do X?" — your answer depends on which layer to reach for. Prompts are zero-code and fastest to iterate. Tools require dev work but give the model real agency. MCP replaces N custom integrations with N server connections. Skills are how you scale a deployment without rebuilding from scratch each time.
+
+**Why it matters (PM angle):**
+Each layer has different cost, maintenance burden, and vendor dependency. Prompt changes are fast but don't give access to live data. MCP is powerful but means trusting third-party server security. Skills are the reuse flywheel — the more you build, the faster each new customer deployment gets.
+
+**Interview answer (say this out loud):**
+"These four layers sit at different levels of the stack. Prompts are pure instruction — the cheapest lever and where I start. Tools give the model agency to act on live data — I split them into read-only and write tools, and gate writes with human approval in sensitive contexts. MCP is the infrastructure standard that replaces ad-hoc tool integrations — instead of writing a custom Slack connector, I connect a Slack MCP server and the model discovers its capabilities at runtime. Skills are the reuse layer — I package proven prompt+logic combos so I can deploy the same workflow to a new customer with just config changes."
+
+**Plugins = combination of all layers:**
+A plugin packages prompt (description) + tools (API endpoints) + manifest (schema) into a distributable unit. ChatGPT Plugins (2023) were the first version — manifest + OpenAPI spec + description, but proprietary and OpenAI-only. MCP is the open-protocol evolution: same concept, open standard, any model + any client. Every MCP server IS a plugin that follows an open spec instead of a proprietary one.
+
+Stack with plugins added:
+- Prompt → instructions (cheapest, no code)
+- Tool → function the model can call (dev code)
+- Plugin → prompt + tools + manifest, packaged for distribution
+- MCP → open protocol standard for how plugins connect to models (npm registry for AI tools)
+- Skill → internal reusable workflows (your own prompt+logic bundles)
+
+FDE answer when customer asks "can we build a plugin?": "Yes — what you're describing is an MCP server. You write a server that exposes your tools and data, we connect it to the model, and the model discovers your capabilities at runtime. The description you write for each tool IS the prompt layer — that tells the model when and how to call it."
+
+**Follow-up the interviewer will ask:**
+"A customer's CISO asks: if the AI can call any MCP tool, how do we control what it can access?"
+Answer: Scope at the server level (only expose tools the AI needs), gate writes in the harness (check every write call against an approved list), and audit log everything (input, output, timestamp for every tool call).
 
 ---
 
