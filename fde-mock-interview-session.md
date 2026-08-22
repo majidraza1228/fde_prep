@@ -2047,5 +2047,29 @@ Practice these as one-sentence answers before every interview. The goal is 10 se
 | Why does the model hallucinate? | "It predicts probable text, not verified facts — no internal uncertainty signal." |
 | What's a skill vs a tool? | "A tool is an API the agent can call; a skill is packaged know-how for a complete job." |
 | What breaks first in complex orchestration? | "Cascading failures, runaway loops, and context window overflow." |
+| What is a plugin? | "A prompt + tools + manifest bundled together — MCP is the open-protocol version of this." |
+| When do you use MCP vs custom tools? | "MCP when the vendor ships a server; custom tools when you own the API and need full control." |
+| Read tool vs write tool — what's the difference? | "Read tools are safe to auto-execute; write tools mutate state and always need a confirmation gate." |
+
+---
+
+## How to Practice — Slash Command Reference
+
+Use these commands in Claude Code to continue drilling:
+
+| Command | What it does |
+|---|---|
+| `/fde-session fde` | Random FDE mock interview question, scored — covers all 6 areas |
+| `/fde-session dataeng` | Data engineering scenario (FDE / PM / Drill mode) |
+| `/fde-session <concept>` | Full concept study: teach → practice cold → score → Notion update |
+| `/concept <topic>` | Deep explanation of any concept at FDE/PM interview depth |
+| `/drill` | Rapid-fire flashcard mode — one question at a time, scored |
+| `/mock-interview` | Full FDE mock interview session |
+
+**Key concepts to re-drill:**
+- Prompts vs Tools vs MCP vs Plugins vs Skills (decision framework)
+- Evals (how to build, judge types, failure triage)
+- Agent system design (shadow mode, read vs write gating, rollout plan)
+- MCP security (scope, gating, audit log)
 
 ---
