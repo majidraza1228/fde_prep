@@ -322,6 +322,17 @@ Claude asks FDE, PM, or Drill — then runs the session.
 
 ---
 
+### `/mock-interview` — Full FDE Mock Interview Session
+
+Runs a complete mock interview end-to-end. Picks a random area, asks one question at a time, scores every answer, and pushes back when answers are vague.
+
+**Usage:**
+```
+/mock-interview
+```
+
+---
+
 ### `/concept` — Explain Any AI Concept at Interview Depth
 
 Name any AI concept. Claude explains it at PM/FDE interview depth — not a textbook definition, not a research paper. Always ends with a ready-to-say interview answer and the follow-up question the interviewer will ask.
@@ -348,6 +359,30 @@ Transformers, attention mechanism, hallucination, RAG, fine-tuning, embeddings, 
 /concept MCP
 /concept hallucination
 ```
+
+---
+
+## How to Practice — Quick Reference
+
+| Command | What it does |
+|---|---|
+| `/fde-session fde` | Random FDE mock interview question, scored — covers all 6 areas |
+| `/fde-session dataeng` | Data engineering scenario (FDE / PM / Drill mode) |
+| `/fde-session <concept>` | Full concept study: teach → practice cold → score → Notion update |
+| `/concept <topic>` | Deep explanation of any concept at FDE/PM interview depth |
+| `/drill` | Rapid-fire flashcard mode — one question at a time, scored |
+| `/mock-interview` | Full FDE mock interview session |
+| `/case` | Cold case study — Claude plays a skeptical enterprise customer |
+| `/hedgefund` | Hedge fund / asset management vertical mock |
+| `/assetmanagement` | Traditional asset management vertical mock |
+| `/dataengineering` | Data engineering vertical mock (standalone) |
+
+**Key concepts to drill:**
+- Prompts vs Tools vs MCP vs Plugins vs Skills (decision framework)
+- Evals (how to build, judge types, failure triage)
+- Agent system design (shadow mode, read vs write gating, rollout plan)
+- MCP security (scope, gating, audit log)
+- Read tool vs write tool — always gate writes with a confirmation step
 
 ---
 
