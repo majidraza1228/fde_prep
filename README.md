@@ -383,6 +383,8 @@ Transformers, attention mechanism, hallucination, RAG, fine-tuning, embeddings, 
 - Agent system design (shadow mode, read vs write gating, rollout plan)
 - MCP security (scope, gating, audit log)
 - Read tool vs write tool — always gate writes with a confirmation step
+- Harness (6 jobs, stop_reason handling, failure modes, what to log first)
+- System prompt (5 components, caching math, 3 security attack surfaces, RAG vs stuffing)
 
 ---
 
@@ -513,7 +515,7 @@ Any `.md` file you drop into `.claude/commands/` becomes a `/commandname` slash 
 - [x] Platform: OpenAI (Responses API, Structured Outputs, Batch API)
 - [x] Platform: Microsoft / Azure / GitHub Copilot
 - [x] Prompt Caching — Deep Dive
-- [x] Foundational Concepts (Model vs Harness, RAG, Fine-tuning, Embeddings, VPC, Tokens, etc.)
+- [x] Foundational Concepts (Model vs Harness, System Prompt, RAG, Fine-tuning, Embeddings, VPC, Tokens, Evals, Prompts vs Tools vs MCP vs Plugins vs Skills, etc.)
 - [x] AI PM Technical Screen (Transformers, Hallucination, LLM vs ML, Orchestration, MCP)
 - [x] Industry Vertical: Hedge Funds (`/hedgefund`)
 - [x] Industry Vertical: Traditional Asset Management (`/assetmanagement`)
