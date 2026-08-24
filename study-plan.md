@@ -1,3 +1,120 @@
+# 4-Week FDE Interview Plan — Targeting Top AI Companies
+
+**Target companies:** Anthropic, OpenAI, Palantir, Scale AI, Databricks
+**Start date:** 2026-08-23
+**Goal:** Pass any FDE loop cold — code, decomp, system design, customer scenario, behavioral
+**Time per day:** 60 min study + 5 min morning habit
+**Method:** Learn → drill cold → score honestly → gap-fill → repeat
+
+---
+
+## Daily Habit (5 min every morning — write from memory, no notes)
+
+```
+1. Full run_agent() function — loop, stop_reasons, tool result format
+2. One-liner: RAG vs fine-tuning vs prompt engineering — when to use each
+3. Prompt caching math — $60/day → $6/day, why
+4. Read tool vs write tool — gating rule
+5. System prompt 5 components — persona, scope, context, tool guidance, format
+```
+
+---
+
+## Week 1 (Aug 23–29) — Close the Code Gap
+
+**Why first:** Every company screens on practical coding. You can't get to the interesting rounds without passing it.
+
+| Day | Date | Focus | Command |
+|---|---|---|---|
+| Mon | Aug 25 | SQL — retention + window functions | `/code-drill sql` (s1, s2) |
+| Tue | Aug 26 | SQL — top-N per group + cohort | `/code-drill sql` (s3, s5) |
+| Wed | Aug 27 | Python — exponential backoff + pagination | `/code-drill python` (p1, p2) |
+| Thu | Aug 28 | Python — CSV normalizer + JSON flattener | `/code-drill python` (p3, p4) |
+| Fri | Aug 29 | Mixed SQL + Python surprise | `/code-drill sql` then `/code-drill python` |
+| Sat | Aug 30 | Agent loop from memory | `/code-drill agent` |
+| Sun | Aug 31 | Review gaps | Re-drill anything below Clean |
+
+**End of week target:** Any SQL or Python drill → Clean in under 5 minutes.
+
+---
+
+## Week 2 (Sep 1–7) — Decomp + System Design
+
+**Why second:** Decomposition round is the #1 rejection reason. You need 6+ reps before it's a reflex.
+
+| Day | Date | Focus | Command |
+|---|---|---|---|
+| Mon | Sep 1 | Decomp intro — 5-step framework | `/decomp` (scenario A or B) |
+| Tue | Sep 2 | Decomp reps | `/decomp` (scenario C or D) |
+| Wed | Sep 3 | Decomp hard scenarios | `/decomp` (scenario E or F) |
+| Thu | Sep 4 | Agent system design | `/fde-session fde` |
+| Fri | Sep 5 | System design — RAG, VPC, security | `/fde-session fde` |
+| Sat | Sep 6 | Decomp + system design back to back | `/decomp` then `/fde-session fde` |
+| Sun | Sep 7 | Concept gaps | `/concept <weakest topic>` |
+
+**End of week target:** Never say "I would build X" as your first sentence in any scenario.
+
+---
+
+## Week 3 (Sep 8–14) — Customer Scenarios + Behavioral
+
+**Why third:** Heavily weighted at Anthropic (safety conviction) and OpenAI (commercial judgment).
+
+| Day | Date | Focus | Command |
+|---|---|---|---|
+| Mon | Sep 8 | Client simulation — non-finance | `/case` (hospital or manufacturing) |
+| Tue | Sep 9 | Client simulation — edge cases | `/case` (champion departure, board misinformation) |
+| Wed | Sep 10 | Behavioral — technical judgment | `/behavioral` (q1, q2, q3) |
+| Thu | Sep 11 | Behavioral — customer-facing | `/behavioral` (q5, q6, q7) |
+| Fri | Sep 12 | Behavioral — FDE-specific | `/behavioral` (q13, q14) |
+| Sat | Sep 13 | Finance vertical full loop | `/hedgefund` or `/assetmanagement` |
+| Sun | Sep 14 | Data engineering full loop | `/dataengineering` (FDE mode) |
+
+**End of week target:** 8 STAR stories ready. Every answer uses "I" not "we". Every result has a number.
+
+---
+
+## Week 4 (Sep 15–21) — Company-Specific Full Mock Loops
+
+**One company per day. Full loop: company brief → code → decomp → scenario → behavioral.**
+
+| Day | Date | Company | Commands |
+|---|---|---|---|
+| Mon | Sep 15 | Anthropic | `/company Anthropic` → `/fde-session fde` → `/behavioral` |
+| Tue | Sep 16 | OpenAI | `/company OpenAI` → `/code-drill python` → `/decomp` |
+| Wed | Sep 17 | Palantir | `/company Palantir` → `/decomp` (30 min timed) → `/case` |
+| Thu | Sep 18 | Scale AI | `/company` Scale AI → `/fde-session fde` → `/concept evals` |
+| Fri | Sep 19 | Databricks | `/company Databricks` → `/code-drill sql` → `/dataengineering` |
+| Sat | Sep 20 | Full cold mock | `/fde-session fde` → `/decomp` → `/behavioral` — no help |
+| Sun | Sep 21 | Gap close | Re-run any Borderline or No hire from the week |
+
+---
+
+## The One Rule
+
+> Every session ends with you saying the answer out loud — not reading it, not typing it. Out loud. That's what locks it in.
+
+---
+
+## Commands Reference
+
+```
+/code-drill sql          SQL reps (retention, window functions, cohort)
+/code-drill python       Python reps (backoff, pagination, CSV, JSON)
+/code-drill agent        agent loop from memory
+/decomp                  decomp round — most important
+/behavioral              STAR story practice (16 questions)
+/fde-session fde         random FDE mock, scored
+/case                    skeptical customer role-play
+/company <name>          company-specific prep
+/concept <topic>         any concept at interview depth
+/dataengineering         data engineering vertical
+/hedgefund               hedge fund vertical
+/assetmanagement         asset management vertical
+```
+
+---
+
 # 3-Week FDE & PM Study Plan
 
 **Goal:** Answer any FDE or PM interview question cold — without scaffolding, without hints.
