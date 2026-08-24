@@ -213,6 +213,75 @@ Lead with RAG architecture and enterprise deployment patterns. Microsoft buyers 
 
 ---
 
+### Databricks
+
+**What they're actually hiring for:**
+Field Engineering / FDE — someone who can run technical workshops with data engineering and ML teams, demonstrate Databricks on customer data, and own post-sale technical success. Lakehouse architecture depth is non-negotiable.
+
+**Interview structure:**
+- Technical screen — SQL, Spark, data architecture
+- Notebook collaboration round — live coding in a Databricks notebook with the interviewer watching
+- Customer workshop simulation — present a solution to a mock data team
+- Behavioral (STAR) — ownership, working across data science and engineering teams
+
+**What they test that other companies don't:**
+Lakehouse fluency. They expect you to explain Delta Lake, Unity Catalog, MLflow, and Mosaic AI without prompting. They also test hands-on Spark — window functions, broadcast joins, partitioning strategy.
+
+**The question they always ask:**
+"A customer has 500 tables in Snowflake and wants to migrate to Databricks. Walk me through how you'd approach this."
+
+**What kills candidates:**
+- Not knowing the difference between Delta Lake and a standard data lake
+- Treating it like a generic AI interview — Databricks is data engineering first, AI second
+- No opinion on dbt vs Spark for transformation — they want you to have one
+
+**Your strongest angle:**
+Lead with data engineering credibility first, AI second. Show you understand the data pipeline before you talk about LLMs sitting on top of it.
+
+**3 things to study:**
+1. Delta Lake — ACID transactions, time travel, Z-ordering
+2. Unity Catalog — data governance, lineage, fine-grained access control
+3. MLflow — experiment tracking, model registry, model serving on Databricks
+
+**Interview answer to rehearse:**
+> "For a Snowflake to Databricks migration, I'd start by auditing the current workload: which tables are queried most, what transformations run daily, and where the bottlenecks are. I'd migrate incrementally — hot tables first, using Delta Live Tables for the pipeline layer. The governance story matters here: Unity Catalog gives them column-level security and lineage they probably don't have in Snowflake today. I'd run both systems in parallel for 60 days before cutover."
+
+---
+
+### ElevenLabs
+
+**What they're actually hiring for:**
+Forward Deployed Engineer — owns enterprise voice AI deployments end-to-end. Customer base includes media, gaming, e-learning, and enterprise content teams. You'll be designing voice workflows, integrating with customer content pipelines, and handling latency/quality tradeoffs in production.
+
+**Interview structure:**
+- Technical screen — API depth, voice AI architecture, latency optimization
+- Customer scenario — given a media company use case, design the voice pipeline
+- Live demo round — demonstrate ElevenLabs API capabilities in real time
+
+**What they test that other companies don't:**
+Voice-specific technical knowledge: TTS latency, voice cloning ethics and consent, streaming audio, SSML, and how to handle multilingual synthesis at scale.
+
+**The question they always ask:**
+"A global e-learning company wants to localize 10,000 hours of video content into 12 languages using AI voice. What are the risks and how do you design this?"
+
+**What kills candidates:**
+- Not addressing voice cloning consent and ethics proactively
+- Ignoring latency — real-time voice has <200ms requirements that batch synthesis doesn't
+- No awareness of quality vs. speed tradeoff at scale
+
+**Your strongest angle:**
+Frame your LLM deployment experience as directly transferable — you understand latency optimization, streaming APIs, and enterprise integration. Add voice-specific awareness on top.
+
+**3 things to study:**
+1. ElevenLabs API — text-to-speech, voice cloning, streaming endpoints
+2. Audio latency optimization — buffering, chunking, streaming vs batch
+3. Voice AI ethics — consent frameworks, synthetic voice disclosure requirements
+
+**Interview answer to rehearse:**
+> "For multilingual video localization at scale, the first constraint is consent — any voice cloning requires explicit rights. Then it's architecture: I'd separate the translation pipeline from the synthesis pipeline. Translation runs in batch overnight; synthesis is triggered per-segment with quality review before final render. At 10,000 hours, you can't human-review everything — so I'd build an automated quality gate scoring pronunciation accuracy and naturalness, flagging anything below threshold for human review."
+
+---
+
 ## If the user asks about a company not listed
 
 Use the same format. Draw on general FDE interview patterns and what you know about that company's product, customer base, and engineering culture.

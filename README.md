@@ -253,6 +253,53 @@ Claude asks FDE or PM, then runs the scenario.
 
 ---
 
+### `/decomp` — Decomposition Round Practice
+
+The #1 differentiator in FDE loops. Most candidates fail by jumping to a solution before understanding the problem. This command drills the 5-step decomposition framework interviewers at Palantir, Anthropic, and OpenAI look for.
+
+**5-step framework:**
+1. Clarify the actual problem before proposing anything
+2. Identify stakeholders and success metrics
+3. Map available inputs and data
+4. Decompose into sequenced subproblems
+5. Thin MVP first, then iterate
+
+**Scenarios covered:**
+- 911 response time reduction (GPS + dispatch logs)
+- Fraud detection across 3 acquired systems with no shared identifiers
+- Pharmaceutical researcher query assistant (VPC + audit trail)
+- Shipment rerouting agent ($50K cost per wrong decision)
+- Insurance claims summarization across 12 regulatory environments
+- Retail inventory forecasting off by 25% during promotions
+
+Claude plays the skeptical problem owner — stays in character until you give a clear recommendation with tradeoffs. Scores on all 5 steps.
+
+**Usage:**
+```
+/decomp
+```
+
+---
+
+### `/behavioral` — STAR Story Practice
+
+FDE behavioral rounds test ownership, customer judgment, and operating under ambiguity — not generic interview stories.
+
+**16 questions across 4 areas:**
+- Technical judgment (hard project, wrong approach, time pressure, new tech)
+- Customer-facing (customer was wrong, pushed back, bad news, deployment failure)
+- Ambiguity and ownership (unfamiliar environment, cross-customer patterns, project failure)
+- FDE-specific (why FDE, what makes a great FDE, 2-year plan)
+
+Claude scores every answer on STAR format + FDE judgment (ownership, customer empathy, specificity). After 3 questions, gives a pattern analysis of your gap.
+
+**Usage:**
+```
+/behavioral
+```
+
+---
+
 ### `/fde-session` — Full Study Session with Notion Tracking (Recommended)
 
 The primary command for structured prep. One command handles the complete loop: **teach → practice → score → auto-update Notion** — no manual tracking needed.
@@ -376,6 +423,18 @@ Transformers, attention mechanism, hallucination, RAG, fine-tuning, embeddings, 
 | `/hedgefund` | Hedge fund / asset management vertical mock |
 | `/assetmanagement` | Traditional asset management vertical mock |
 | `/dataengineering` | Data engineering vertical mock (standalone) |
+
+**New commands added (from Exponent gap analysis):**
+
+| Command | What it covers |
+|---|---|
+| `/decomp` | Decomposition round — 5-step framework, 6 real scenarios, skeptical customer role-play |
+| `/behavioral` | 16 STAR story questions across 4 areas, FDE judgment scoring |
+| `/code-drill python` | Practical Python: exponential backoff, pagination, CSV normalization, JSON flattening |
+| `/code-drill sql` | SQL: retention queries, window functions, top-N per group, cohort analysis |
+| `/company Databricks` | Lakehouse architecture, Delta Lake, Unity Catalog, notebook round prep |
+| `/company ElevenLabs` | Voice AI deployment, latency, multilingual synthesis, consent framework |
+| `/case` | Now includes non-finance verticals: hospital, manufacturing, government, law firm |
 
 **Key concepts to drill:**
 - Prompts vs Tools vs MCP vs Plugins vs Skills (decision framework)
@@ -523,6 +582,11 @@ Any `.md` file you drop into `.claude/commands/` becomes a `/commandname` slash 
 - [x] Graph Engineering (agent graphs, LangGraph, nodes/edges/state)
 - [x] GraphRAG (knowledge graphs + retrieval, multi-hop reasoning)
 - [x] Top 10 AI Concepts structured study track with Notion tracking (`/fde-session`)
+- [x] Decomposition Round — 5-step framework + 6 scenarios (`/decomp`)
+- [x] Behavioral / STAR Stories — 16 questions, FDE judgment scoring (`/behavioral`)
+- [x] Practical Coding Drills — Python + SQL on-site style (`/code-drill python/sql`)
+- [x] Company-Specific: Databricks, ElevenLabs added to `/company`
+- [x] Non-finance Case Studies — hospital, manufacturing, government, law firm (`/case`)
 - [ ] Kubernetes + AWS for AI Workloads
 - [ ] Industry Vertical: Legal / Law Firms
 - [ ] Industry Vertical: Healthcare

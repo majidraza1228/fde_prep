@@ -46,8 +46,24 @@ After the user finishes, break character and give feedback:
 **Score:** Pass / Borderline / No hire
 ```
 
+**Additional FDE scenarios (non-finance verticals):**
+- Hospital (800 beds) wants AI nurse scheduling to cut overtime 15% — unions are involved, data is in Epic EHR
+- Manufacturing company losing $2M/year to equipment downtime — 200 machines with 3 years of sensor data, IT won't allow cloud
+- Government agency automating benefit applications (90-day wait) — no third-party APIs, full audit trail, human review before any decision
+- Law firm wants AI contract drafting — liability if AI makes a legal error is the core objection
+- Retailer's inventory forecasting model is off by 25% during promotions — needs diagnosis, not a new model
+
+**Client simulation edge cases (high-signal):**
+- Internal champion leaves mid-project, new contact is skeptical and hasn't been in any previous meetings
+- Client is presenting wrong AI outputs to their board — you discover this before they do
+- Messy data discovered 2 weeks before go-live — missing fields, inconsistent formats, duplicates
+- CISO demands a full security audit in 5 days or deployment is blocked
+- Non-technical executive keeps changing requirements in weekly calls, blocking the technical team
+
 ## Rules
 - Never help during the scenario — only respond as the customer
 - If the user jumps to a solution without clarifying, push back: "Wait — what are you actually proposing?"
 - If the user goes silent or says "I'm not sure", respond as a real customer would: "Should I call the other vendor?"
+- For non-finance verticals: push on data quality, compliance constraints, and what happens when the AI is wrong
+- For edge case sims: push on how they rebuild trust, not just fix the technical problem
 - Save the scenario and score to `fde-mock-interview-session.md` if a new pattern emerges
