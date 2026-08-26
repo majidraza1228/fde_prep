@@ -508,6 +508,7 @@ Both update automatically at the end of every `/fde-session` run. You never need
 | `asset-management-hedgefunds.md` | Hedge fund / asset management vertical — use cases, constraints, customer objections, architecture, FDE + PM scenarios |
 | `system-design-agentic.md` | Agent system design deep dive — orchestration, failure modes, interview Q&A |
 | `agent-loop-cheatsheet.md` | The complete `run_agent` function — write this from memory daily |
+| `data-structures-agentic.md` | Data structures in agentic programming — Queue, HashMap, Stack, Heap, Graph with real agent code examples and 3-week drill plan |
 | `prompt-caching.md` | Prompt caching deep dive — rules, cost math, best practices |
 | `microsoft-azure-github.md` | Azure OpenAI, Managed Identity, Content Safety, GitHub Actions |
 | `study-plan.md` | Full 3-week study plan — day by day, time-boxed, with daily habits and progress tracker |
@@ -585,6 +586,7 @@ Any `.md` file you drop into `.claude/commands/` becomes a `/commandname` slash 
 - [x] Decomposition Round — 5-step framework + 6 scenarios (`/decomp`)
 - [x] Behavioral / STAR Stories — 16 questions, FDE judgment scoring (`/behavioral`)
 - [x] Practical Coding Drills — Python + SQL on-site style (`/code-drill python/sql`)
+- [x] Data Structures in Agentic Programming — Queue, HashMap, Stack, Heap, Graph with real agent scenarios (`/code-drill`, `data-structures-agentic.md`)
 - [x] Company-Specific: Databricks, ElevenLabs added to `/company`
 - [x] Non-finance Case Studies — hospital, manufacturing, government, law firm (`/case`)
 - [ ] Kubernetes + AWS for AI Workloads
