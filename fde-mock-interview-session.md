@@ -67,6 +67,37 @@ PMs at AI-native companies (Anthropic, OpenAI, Palantir) are expected to have **
 - "Design an AI product for X — what's your biggest risk?"
 - "How would you explain hallucination rate to a non-technical executive?"
 
+### Breaking Into AI PM — The Synthetic Experience Pyramid
+
+AI PM jobs went from **2% → 46%** of all PM listings between Feb 2024 and mid-2026. Even plain "Product Manager" listings ask for AI experience **66%** of the time (nearly as often as roles explicitly titled AI PM, at 70%). Only 1 in 8 jobs require production AI experience — for the rest, synthetic experience is enough.
+
+**The 5 Levels (climb as high as you can):**
+
+| Level | What It Is | Interview Signal |
+|---|---|---|
+| 1 | Courses + Certifications | Vocabulary, forcing function to learn — weakest proof |
+| 2 | Personal builds you can demo (live URL, evals) | Strong artifact for resume + interview |
+| 3 | Builds with real users | Turns a side project into real "experience" |
+| 4 | Freelance/consulting AI work | Listable resume line as an AI gig |
+| 5 | Shipped AI as a PM (at a company) | Most powerful — make the opportunity happen |
+
+**How to use this in interviews:**
+- If you're at Level 2–3: lead with the demo. Name the model, the eval, the user feedback.
+- If you're at Level 4: frame it as a real engagement — scope, deliverable, outcome.
+- If you're at Level 1 only: don't lead with it. Pair it with a personal build or use it to explain your depth on a technical question.
+
+**What interviewers are actually checking:**
+- Can you talk about a real AI artifact you shipped, not a theoretical one?
+- Do you know the difference between evals for hallucination vs. evals for task completion?
+- Have you seen real user behavior on an AI product (even at small scale)?
+
+**Resume framing for synthetic experience:**
+- Level 2: "Built and deployed [product] using [model/API], serving [N] users. Instrumented evals tracking [metric]."
+- Level 3: "Iterated on [product] with [N] real users. Identified [key insight]. Shipped [improvement]."
+- Level 4: "Consulted for [client type] on AI implementation. Delivered [outcome]."
+
+---
+
 ### PM vs FDE — Where They Overlap
 
 | Skill | FDE | PM |

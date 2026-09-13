@@ -114,6 +114,9 @@ Runs a Product Manager interview for AI-native companies (Anthropic, OpenAI, Gle
 **Signature push:** After every technical answer, Claude asks:
 > "Can you go one level deeper?"
 
+**Breaking into AI PM — Synthetic Experience Pyramid:**
+AI PM listings went from 2% → 46% of all PM jobs (2024–2026). Plain "Product Manager" roles ask for AI experience 66% of the time. Only 1 in 8 require production experience — for the rest, synthetic experience is enough. The `/pm` command now uses the 5-level pyramid (Courses → Personal Builds → Builds with Real Users → Freelance Work → Shipped AI as PM) to evaluate your answer framing.
+
 **Usage:**
 ```
 /pm
@@ -589,6 +592,7 @@ Any `.md` file you drop into `.claude/commands/` becomes a `/commandname` slash 
 - [x] Data Structures in Agentic Programming — Queue, HashMap, Stack, Heap, Graph with real agent scenarios (`/code-drill`, `data-structures-agentic.md`)
 - [x] Company-Specific: Databricks, ElevenLabs added to `/company`
 - [x] Non-finance Case Studies — hospital, manufacturing, government, law firm (`/case`)
+- [x] AI PM Entry Strategy — Synthetic Experience Pyramid (5 levels, resume framing, interview usage)
 - [ ] Kubernetes + AWS for AI Workloads
 - [ ] Industry Vertical: Legal / Law Firms
 - [ ] Industry Vertical: Healthcare
